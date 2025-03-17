@@ -1,0 +1,240 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "GR-.#####",
+ "creation": "2025-03-06 15:09:03.298393",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "posting_date",
+  "receive_type",
+  "recieved_person",
+  "received_date",
+  "column_break_x85t",
+  "reciept_number",
+  "received_amount",
+  "program",
+  "letter_head",
+  "amount_details_section",
+  "mode",
+  "bank_account",
+  "account_number",
+  "dd_number",
+  "dd_date",
+  "cheque_date",
+  "cheque_number",
+  "upi_id",
+  "reference_number",
+  "section_break_lpnd",
+  "remarks",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "receive_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Description",
+   "options": "Receive Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "recieved_person",
+   "fieldtype": "Link",
+   "label": "Name",
+   "options": "Receiving Person",
+   "reqd": 1
+  },
+  {
+   "fieldname": "received_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_x85t",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reciept_number",
+   "fieldtype": "Data",
+   "label": "Reciept Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "received_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Received Amount",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "label": "Letter head",
+   "options": "Letter Head"
+  },
+  {
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "Program"
+  },
+  {
+   "fieldname": "amount_details_section",
+   "fieldtype": "Section Break",
+   "label": "Amount Details"
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "\nDD\nCheque\nCash\nMO\nOnline Transfer\nGPAY / QR Code"
+  },
+  {
+   "depends_on": "eval:doc.mode!='Cash' && doc.mode!=''",
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account"
+  },
+  {
+   "depends_on": "eval:doc.mode!='Cash' && doc.mode!=''",
+   "fetch_from": "bank_account.bank_account_no",
+   "fetch_if_empty": 1,
+   "fieldname": "account_number",
+   "fieldtype": "Data",
+   "label": "Account Number"
+  },
+  {
+   "depends_on": "eval:doc.mode == \"DD\"",
+   "fieldname": "dd_number",
+   "fieldtype": "Data",
+   "label": "DD Number"
+  },
+  {
+   "depends_on": "eval:doc.mode == \"DD\"",
+   "fieldname": "dd_date",
+   "fieldtype": "Date",
+   "label": "DD Date"
+  },
+  {
+   "depends_on": "eval:doc.mode=='Cheque'",
+   "fieldname": "cheque_date",
+   "fieldtype": "Date",
+   "label": "Cheque date"
+  },
+  {
+   "depends_on": "eval:doc.mode=='Cheque'",
+   "fieldname": "cheque_number",
+   "fieldtype": "Data",
+   "label": "Cheque Number"
+  },
+  {
+   "depends_on": "eval:doc.mode =='GPAY / QR Code'",
+   "fieldname": "upi_id",
+   "fieldtype": "Data",
+   "label": "UPI ID"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='GPAY / QR Code' || doc.mode=='Online Transfer' || doc.mode == \"MO\"",
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "fieldname": "section_break_lpnd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "General Receipt",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-03-13 12:24:14.483954",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "General Receipt",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

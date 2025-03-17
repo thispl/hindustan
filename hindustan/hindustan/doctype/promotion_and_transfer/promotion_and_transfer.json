@@ -1,0 +1,245 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-12-17 14:38:17.596518",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_kls9",
+  "amended_from",
+  "promotion__transfer",
+  "column_break_i9qg",
+  "promotion_via_assessment",
+  "column_break_ubjp",
+  "transfer",
+  "section_break_tp9h",
+  "academic_year",
+  "student_id__admission_id",
+  "student_name",
+  "institute_name",
+  "program",
+  "batchsem",
+  "section",
+  "promotion_academic_year",
+  "promotion_sem__batch",
+  "transfered_academic_year",
+  "transfered_sembatch",
+  "transfered_institute_name",
+  "transfered_program",
+  "get_students",
+  "get_student",
+  "student_promotion",
+  "naming_series",
+  "cancellation_remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_kls9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Promotion And Transfer",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "promotion__transfer",
+   "fieldtype": "Check",
+   "label": "Promotion",
+   "read_only_depends_on": "eval:doc.transfer==1 || doc.promotion_via_assessment==1"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fieldname": "academic_year",
+   "fieldtype": "Link",
+   "label": "Academic Year ",
+   "options": "Academic Year"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fetch_from": "student_id__admission_id.custom_institute_name",
+   "fetch_if_empty": 1,
+   "fieldname": "institute_name",
+   "fieldtype": "Link",
+   "label": "Institute Name ",
+   "options": "Institute"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.transfer==1",
+   "fieldname": "student_id__admission_id",
+   "fieldtype": "Link",
+   "label": "Student Id / Admission ID ",
+   "options": "Student"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fetch_from": "student_id__admission_id.custom_program",
+   "fetch_if_empty": 1,
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "Program"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fetch_from": "student_id__admission_id.custom_current_academic_term",
+   "fetch_if_empty": 1,
+   "fieldname": "batchsem",
+   "fieldtype": "Link",
+   "label": "Batch/Sem ",
+   "options": "Academic Term"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fieldname": "section",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Section "
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1",
+   "fieldname": "promotion_academic_year",
+   "fieldtype": "Link",
+   "label": "Promotion Academic Year ",
+   "options": "Academic Year"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1|| doc.promotion_via_assessment==1",
+   "fieldname": "promotion_sem__batch",
+   "fieldtype": "Link",
+   "label": "Promotion Sem / Batch ",
+   "options": "Academic Term"
+  },
+  {
+   "default": "0",
+   "fieldname": "transfer",
+   "fieldtype": "Check",
+   "label": "Transfer ",
+   "read_only_depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1"
+  },
+  {
+   "fieldname": "column_break_ubjp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:!doc.student_id__admission_id",
+   "fieldname": "student_promotion",
+   "fieldtype": "Table",
+   "options": "Student Promotion"
+  },
+  {
+   "depends_on": "eval:!doc.student_id__admission_i&&doc.promotion__transfer==1 || doc.transfer==1",
+   "fieldname": "get_students",
+   "fieldtype": "Button",
+   "label": "Get Students"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "\nPRO.#####\nTRA.#####",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.transfer==1",
+   "fieldname": "transfered_academic_year",
+   "fieldtype": "Link",
+   "label": "Transfered Academic year",
+   "options": "Academic Year"
+  },
+  {
+   "depends_on": "eval:doc.transfer==1",
+   "fieldname": "transfered_sembatch",
+   "fieldtype": "Link",
+   "label": "Transfered Sem/Batch",
+   "options": "Academic Term"
+  },
+  {
+   "depends_on": "eval:doc.transfer==1",
+   "fieldname": "transfered_institute_name",
+   "fieldtype": "Link",
+   "label": "Transfered Institute Name",
+   "options": "Institute"
+  },
+  {
+   "depends_on": "eval:doc.transfer==1",
+   "fieldname": "transfered_program",
+   "fieldtype": "Link",
+   "label": "Transfered Program",
+   "options": "Program"
+  },
+  {
+   "depends_on": "eval:doc.promotion_via_assessment==1",
+   "description": "Promotion Based on Assessment",
+   "fieldname": "get_student",
+   "fieldtype": "Button",
+   "label": "Get Students"
+  },
+  {
+   "fieldname": "column_break_i9qg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "promotion_via_assessment",
+   "fieldtype": "Check",
+   "label": "Promotion Via Assessment",
+   "read_only_depends_on": "eval:doc.promotion__transfer==1 || doc.transfer==1"
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fieldname": "section_break_tp9h",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "cancellation_remarks",
+   "fieldtype": "Small Text",
+   "label": "Cancellation Remarks",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student_id__admission_id.first_name",
+   "fetch_if_empty": 1,
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "label": "Student Name",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-01-20 13:09:51.511629",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Promotion And Transfer",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

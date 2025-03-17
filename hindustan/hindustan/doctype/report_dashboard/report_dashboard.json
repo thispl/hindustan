@@ -1,0 +1,89 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-21 12:08:37.267548",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "from_date",
+  "report",
+  "column_break_hwcv",
+  "to_date",
+  "institute_name",
+  "department",
+  "download",
+  "pdf"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "report",
+   "fieldtype": "Select",
+   "label": "Report",
+   "options": "\nConsolidated statement\nSalary Register\nConsolidated Salary statement\nTransfer Statement"
+  },
+  {
+   "fieldname": "column_break_hwcv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "download",
+   "fieldtype": "Button",
+   "label": "Download"
+  },
+  {
+   "fieldname": "institute_name",
+   "fieldtype": "Link",
+   "label": "Institute Name",
+   "options": "Institute"
+  },
+  {
+   "depends_on": "eval:doc.report==\"Consolidated Salary statement\"",
+   "fieldname": "pdf",
+   "fieldtype": "Button",
+   "label": "PDF"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-01-17 17:37:19.311549",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Report Dashboard",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

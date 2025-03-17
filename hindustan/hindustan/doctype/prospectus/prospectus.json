@@ -1,0 +1,395 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:EVE-{#######}",
+ "creation": "2024-12-10 19:19:14.816153",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "issue_date",
+  "institution_name",
+  "academic_year",
+  "institute_short_code",
+  "column_break_0sra",
+  "receipt_number",
+  "program",
+  "course_name",
+  "prospectus_fee",
+  "letter_head",
+  "section_break_ls07",
+  "student_name",
+  "student_category",
+  "date_of_birth",
+  "age",
+  "gender",
+  "mobile_number",
+  "email",
+  "column_break_vxxd",
+  "father_name",
+  "religion",
+  "mother_tongue",
+  "caste",
+  "category",
+  "column_break_bjhr",
+  "country",
+  "state",
+  "city",
+  "address",
+  "payment_details_section",
+  "payment_date",
+  "payment_mode",
+  "paid_amount",
+  "column_break_a5ub",
+  "bank",
+  "account_name",
+  "upi_ref_number",
+  "cheque_date",
+  "cheque_number",
+  "reference_number",
+  "dd_number",
+  "dd_date",
+  "account_number",
+  "section_break_4sdf",
+  "remarks",
+  "section_break_ygpy",
+  "amended_from",
+  "journal_entry_reference",
+  "cancellation_remarks"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "issue_date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "academic_year",
+   "fieldtype": "Link",
+   "label": "Academic Year",
+   "options": "Academic Year",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "institution_name.institute_short_code",
+   "fieldname": "institute_short_code",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Institute Short Code"
+  },
+  {
+   "fieldname": "column_break_0sra",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "course_name",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Course",
+   "options": "Course"
+  },
+  {
+   "fieldname": "prospectus_fee",
+   "fieldtype": "Currency",
+   "label": "Application Fee"
+  },
+  {
+   "fieldname": "receipt_number",
+   "fieldtype": "Data",
+   "label": "Receipt Number"
+  },
+  {
+   "fieldname": "section_break_ls07",
+   "fieldtype": "Section Break",
+   "label": "Student Details"
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "Student Name ",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date Of Birth"
+  },
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Age",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nFemale\nMale\nOthers"
+  },
+  {
+   "default": "+91-",
+   "fieldname": "mobile_number",
+   "fieldtype": "Phone",
+   "in_list_view": 1,
+   "label": "Mobile Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "no_copy": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_vxxd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "father_name",
+   "fieldtype": "Data",
+   "label": "Father Name"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "reqd": 1
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "payment_details_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date",
+   "mandatory_depends_on": "eval:doc.paid_amount > 0",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode ",
+   "mandatory_depends_on": "eval:doc.paid_amount > 0",
+   "options": "\nDD\nCheque\nCash\nMO\nOnline Transfer\nGPAY / QR Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_a5ub",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode =='GPAY / QR Code'",
+   "fieldname": "upi_ref_number",
+   "fieldtype": "Data",
+   "label": "UPI"
+  },
+  {
+   "depends_on": "eval: doc.payment_mode =='Cheque'",
+   "fieldname": "cheque_number",
+   "fieldtype": "Data",
+   "label": "Cheque Number"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode =='GPAY / QR Code' || doc.payment_mode =='Online Transfer' || doc.payment_mode ==\"MO\"",
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode !='Cash'",
+   "fetch_from": "account_name.bank_account_no",
+   "fieldname": "account_number",
+   "fieldtype": "Data",
+   "label": "Account Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_4sdf",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "section_break_ygpy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Prospectus",
+   "print_hide": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "Program"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "student_category",
+   "fieldtype": "Link",
+   "label": "Student Category/Domicile",
+   "options": "Student Category",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.payment_mode !='Cash'",
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Bank",
+   "options": "Bank"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode !='Cash' && doc.payment_mode !=''",
+   "fieldname": "account_name",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account"
+  },
+  {
+   "fieldname": "journal_entry_reference",
+   "fieldtype": "Link",
+   "label": "Journal Entry Reference",
+   "options": "Journal Entry"
+  },
+  {
+   "fieldname": "institution_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Institution Name ",
+   "options": "Institute",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "cancellation_remarks",
+   "fieldtype": "Small Text",
+   "label": "Cancellation Remarks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "religion",
+   "fieldtype": "Link",
+   "label": "Religion",
+   "options": "Religion"
+  },
+  {
+   "fieldname": "mother_tongue",
+   "fieldtype": "Link",
+   "label": "Mother Tongue",
+   "options": "Mother Tongue"
+  },
+  {
+   "fieldname": "caste",
+   "fieldtype": "Link",
+   "label": "Caste",
+   "options": "Caste"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "Category"
+  },
+  {
+   "fieldname": "column_break_bjhr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "label": "Letter Head",
+   "options": "Letter Head"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode ==\"DD\"",
+   "fieldname": "dd_number",
+   "fieldtype": "Data",
+   "label": "DD Number"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode ==\"DD\"",
+   "fieldname": "dd_date",
+   "fieldtype": "Date",
+   "label": "DD Date"
+  },
+  {
+   "depends_on": "eval: doc.payment_mode =='Cheque'",
+   "fieldname": "cheque_date",
+   "fieldtype": "Date",
+   "label": "Cheque Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-03-03 17:36:40.004262",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Prospectus",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "student_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

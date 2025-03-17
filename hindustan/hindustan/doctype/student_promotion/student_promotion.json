@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-17 16:03:17.784087",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student_id__admission_id",
+  "program",
+  "batchsem",
+  "section"
+ ],
+ "fields": [
+  {
+   "fieldname": "student_id__admission_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student Id / Admission ID ",
+   "options": "Student",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student_id__admission_id.custom_program",
+   "fetch_if_empty": 1,
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Program",
+   "options": "Program",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student_id__admission_id.custom_current_academic_term",
+   "fetch_if_empty": 1,
+   "fieldname": "batchsem",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Batch/Sem ",
+   "options": "Academic Term",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student_id__admission_id.custom_section",
+   "fetch_if_empty": 1,
+   "fieldname": "section",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Section",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-12-20 12:30:31.148557",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Student Promotion",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

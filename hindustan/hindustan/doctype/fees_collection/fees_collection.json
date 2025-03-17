@@ -1,0 +1,698 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-12-21 14:57:16.592054",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "student",
+  "registration_number",
+  "admission_number",
+  "student_name",
+  "include_payment",
+  "send_payment_request",
+  "column_break_smlc",
+  "company",
+  "posting_date",
+  "posting_time",
+  "due_date",
+  "set_posting_time",
+  "section_break_lhyo",
+  "program_enrollment",
+  "program",
+  "fees",
+  "column_break_oglf",
+  "institute",
+  "academic_year",
+  "academic_term",
+  "reference",
+  "fee_structure",
+  "currency",
+  "column_break_xlwo",
+  "fee_schedule",
+  "advances_section",
+  "advance_payment",
+  "section_break_qelp",
+  "column_break_ithm",
+  "automatic_creation",
+  "payment_mode",
+  "payment_date",
+  "amount",
+  "column_break_amsd",
+  "bank_name",
+  "account_number",
+  "dd_number",
+  "dd_date",
+  "cheque_date",
+  "cheque_number",
+  "upi_id",
+  "reference_number",
+  "column_break_jzco",
+  "get_advance",
+  "adjust_advance",
+  "section_break_ulrc",
+  "column_break_fyop",
+  "pay_advance",
+  "excess_amount",
+  "column_break_vbhf",
+  "mark_concession",
+  "concession_on",
+  "concession_amount",
+  "payment_reference_section",
+  "components",
+  "section_break_hhld",
+  "grand_total",
+  "grand_total_in_words",
+  "amount_paid",
+  "amended_from",
+  "column_break_uqmd",
+  "outstanding_amount",
+  "paying_amount",
+  "section_break_hssj",
+  "remarks",
+  "student_details_tab",
+  "contact_email",
+  "student_category",
+  "column_break_wjay",
+  "student_batch",
+  "accounts_tab",
+  "accounting_section",
+  "receivable_account",
+  "column_break_oatf",
+  "income_account",
+  "accounting_dimensions_section",
+  "cost_center",
+  "print_settings_tab",
+  "print_settings_section",
+  "letter_head",
+  "column_break_pvga",
+  "print_heading",
+  "cancellation_remarks_tab",
+  "section_break_nb4g",
+  "cancellation_remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "EDU-FC-.YYYY.-",
+   "print_hide": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student"
+  },
+  {
+   "fetch_from": "student.student_name",
+   "fetch_if_empty": 1,
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "label": "Student Name",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "include_payment",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Include Payment",
+   "print_hide": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "send_payment_request",
+   "fieldtype": "Check",
+   "label": "Send Payment Request",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_smlc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Company",
+   "options": "Company",
+   "remember_last_selected_value": 1
+  },
+  {
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_lhyo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "program_enrollment",
+   "fieldtype": "Link",
+   "label": "Program Enrollment",
+   "options": "Program Enrollment",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "student.custom_program",
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Program",
+   "options": "Program"
+  },
+  {
+   "fieldname": "column_break_oglf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "student.custom_academic_year",
+   "fieldname": "academic_year",
+   "fieldtype": "Link",
+   "label": "Academic Year",
+   "options": "Academic Year"
+  },
+  {
+   "fieldname": "academic_term",
+   "fieldtype": "Link",
+   "label": "Academic Term",
+   "options": "Academic Term"
+  },
+  {
+   "fieldname": "fee_structure",
+   "fieldtype": "Link",
+   "label": "Fee Structure",
+   "options": "Fee Structure",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "fee_schedule",
+   "fieldtype": "Link",
+   "in_global_search": 1,
+   "label": "Fee Schedule",
+   "options": "Fee Schedule",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Currency",
+   "options": "Currency",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "components",
+   "fieldtype": "Table",
+   "label": "Components",
+   "options": "Fee Collection Component",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_hhld",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Fees Collection",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_uqmd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "grand_total_in_words",
+   "fieldtype": "Data",
+   "label": "In Words",
+   "length": 240,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "label": "Outstanding Amount",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Fees Collection",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "student_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Student Details"
+  },
+  {
+   "allow_on_submit": 1,
+   "fetch_from": "student.student_email_id",
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Student Email",
+   "options": "Email",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "student_category",
+   "fieldtype": "Link",
+   "label": "Student Category",
+   "options": "Student Category"
+  },
+  {
+   "fieldname": "column_break_wjay",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "student_batch",
+   "fieldtype": "Link",
+   "label": "Student Batch",
+   "options": "Student Batch Name",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "accounts_tab",
+   "fieldtype": "Tab Break",
+   "label": "Accounts"
+  },
+  {
+   "fieldname": "accounting_section",
+   "fieldtype": "Section Break",
+   "label": "Accounting"
+  },
+  {
+   "fetch_from": "fee_structure.receivable_account",
+   "fieldname": "receivable_account",
+   "fieldtype": "Link",
+   "label": "Receivable Account",
+   "options": "Account",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_oatf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "fee_structure.income_account",
+   "fieldname": "income_account",
+   "fieldtype": "Link",
+   "label": "Income Account",
+   "options": "Account",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "accounting_dimensions_section",
+   "fieldtype": "Section Break",
+   "label": "Accounting Dimensions"
+  },
+  {
+   "fetch_from": "fee_structure.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "print_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "Print Settings"
+  },
+  {
+   "fieldname": "print_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Print Settings"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "label": "Letter Head",
+   "options": "Letter Head",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "column_break_pvga",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "print_heading",
+   "fieldtype": "Link",
+   "label": "Print Heading",
+   "no_copy": 1,
+   "options": "Print Heading",
+   "print_hide": 1,
+   "report_hide": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.docstatus==0",
+   "fieldname": "set_posting_time",
+   "fieldtype": "Check",
+   "label": "Edit Posting Date and Time"
+  },
+  {
+   "bold": 1,
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "no_copy": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "fees",
+   "fieldtype": "Link",
+   "label": "Fees",
+   "options": "Fees",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "amount_paid",
+   "fieldtype": "Currency",
+   "label": "Amount Paid Before",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "paying_amount",
+   "fieldtype": "Currency",
+   "label": "Amount Paid",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "payment_reference_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Reference "
+  },
+  {
+   "fieldname": "column_break_xlwo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "get_advance",
+   "fieldtype": "Check",
+   "label": "Get Advance"
+  },
+  {
+   "fieldname": "advance_payment",
+   "fieldtype": "Table",
+   "label": "Advance Payment",
+   "options": "Advance Payment",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student.custom_registration_number",
+   "fieldname": "registration_number",
+   "fieldtype": "Link",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "label": "Registration Number",
+   "options": "Registration",
+   "reqd": 1
+  },
+  {
+   "fieldname": "advances_section",
+   "fieldtype": "Section Break",
+   "label": "Advances"
+  },
+  {
+   "depends_on": "eval: doc.automatic_creation == 0",
+   "fieldname": "section_break_qelp",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "column_break_ithm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_jzco",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.advance_payment.length>0",
+   "fieldname": "adjust_advance",
+   "fieldtype": "Button",
+   "label": "Adjust Advance"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode !='Cash'",
+   "fieldname": "column_break_amsd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.mark_concession && doc.concession_on",
+   "fieldname": "concession_amount",
+   "fieldtype": "Currency",
+   "label": "Concession Amount",
+   "mandatory_depends_on": "eval: doc.mark_concession",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "section_break_nb4g",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval: doc.docstatus != 0 && !(doc.is__local)",
+   "fieldname": "cancellation_remarks",
+   "fieldtype": "Small Text",
+   "label": "Cancellation Remarks"
+  },
+  {
+   "fieldname": "cancellation_remarks_tab",
+   "fieldtype": "Tab Break",
+   "label": "Cancellation Remarks",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student.custom_institute_name",
+   "fieldname": "institute",
+   "fieldtype": "Link",
+   "label": "Institute",
+   "options": "Institute"
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "mandatory_depends_on": "eval:doc.payment_mode !='Cash'",
+   "options": "\nDD\nCheque\nCash\nMO\nOnline Transfer\nGPAY / QR Code",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='Cheque'",
+   "fieldname": "cheque_number",
+   "fieldtype": "Data",
+   "label": "Cheque Number",
+   "mandatory_depends_on": "eval:doc.payment_mode=='Cheque'"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='GPAY / QR Code' || doc.payment_mode=='Online Transfer' || doc.payment_mode == \"MO\"",
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number",
+   "mandatory_depends_on": "eval:doc.payment_mode=='GPAY / QR Code' || doc.payment_mode=='Online Transfer'"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode!='Cash' && doc.payment_mode!=''",
+   "fetch_from": "bank_name.bank_account_no",
+   "fieldname": "account_number",
+   "fieldtype": "Data",
+   "label": "Account Number",
+   "mandatory_depends_on": "eval:doc.payment_mode=='DD'",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.payment_mode =='GPAY / QR Code'",
+   "fieldname": "upi_id",
+   "fieldtype": "Data",
+   "label": "UPI ID",
+   "mandatory_depends_on": "eval:doc.payment_mode =='GPAY / QR Code'"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode!='Cash' && doc.payment_mode!=''",
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account"
+  },
+  {
+   "default": "0",
+   "fieldname": "pay_advance",
+   "fieldtype": "Check",
+   "label": "Pay Advance"
+  },
+  {
+   "depends_on": "eval:doc.pay_advance",
+   "fieldname": "excess_amount",
+   "fieldtype": "Currency",
+   "label": "Excess Amount",
+   "mandatory_depends_on": "eval:doc.pay_advance",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "section_break_ulrc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "mark_concession",
+   "fieldtype": "Check",
+   "label": "Concession"
+  },
+  {
+   "fieldname": "column_break_fyop",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vbhf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.mark_concession",
+   "fieldname": "concession_on",
+   "fieldtype": "Link",
+   "label": "Concession On",
+   "mandatory_depends_on": "eval: doc.mark_concession || doc.concession_amount",
+   "options": "Fee Category"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"DD\"",
+   "fieldname": "dd_number",
+   "fieldtype": "Data",
+   "label": "DD Number"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"DD\"",
+   "fieldname": "dd_date",
+   "fieldtype": "Date",
+   "label": "DD Date"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='Cheque'",
+   "fieldname": "cheque_date",
+   "fieldtype": "Date",
+   "label": "Cheque Date"
+  },
+  {
+   "fieldname": "section_break_hssj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fetch_from": "student.custom_admission_number",
+   "fetch_if_empty": 1,
+   "fieldname": "admission_number",
+   "fieldtype": "Link",
+   "label": "Admission Number",
+   "options": "Admission"
+  },
+  {
+   "default": "0",
+   "fieldname": "automatic_creation",
+   "fieldtype": "Check",
+   "label": "Automatic Creation",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [
+  {
+   "link_doctype": "Concession",
+   "link_fieldname": "fees_collection"
+  }
+ ],
+ "modified": "2025-03-15 11:51:03.545732",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Fees Collection",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

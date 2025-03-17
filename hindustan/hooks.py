@@ -74,10 +74,15 @@ app_license = "mit"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "hindustan.utils.jinja_methods",
+jinja = {
+    "methods":[
+        "hindustan.hindustan.doctype.report_dashboard.consolidated_salary_statement.print_consolidated_salary",
+        "hindustan.custom.format_currency",
+        "hindustan.custom.add_suffix_to_date"
+    ]
+	# "methods": "hindustan.utils.jinja_methods",
 # 	"filters": "hindustan.utils.jinja_filters"
-# }
+}
 
 # Installation
 # ------------
@@ -137,13 +142,54 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	# "*": {
+	# 	"on_update": "method",
+	# 	"on_cancel": "method",
+	# 	"on_trash": "method"
+	# }
+    "Employee": {
+        "after_insert": [
+            "hindustan.custom.teaching_type"  
+        ],
+        "on_update": [
+            "hindustan.custom.teaching_type"  
+        ],
+        "validate":[
+            "hindustan.custom.employee_doc_validation_method"
+        ]
+    },
+    "Fee Structure":{
+        "on_submit":'hindustan.custom.create_update_overall_fee_structure',
+		"on_cancel":'hindustan.custom.create_update_overall_fee_structure'
+  	},
+    "Payment Entry": {
+        "on_submit": "hindustan.custom.create_student_log_on_payment",
+        "on_cancel": "hindustan.custom.delete_student_log_on_payment"
+    },
+    "Fees": {
+        "validate": [
+            "hindustan.custom.validate_advance_payments",
+            "hindustan.custom.validate_outstanding_amount",
+        ],
+        # "on_submit": ["hindustan.custom.create_fees_collection_for_registration"]
+    },
+	"Leave Application":{
+		"validate": ['hindustan.custom.leave_restriction_el_after','hindustan.custom.leave_restriction_el_before','hindustan.custom.leave_restriction_combining_after','hindustan.custom.leave_restriction_combining_before'],
+	},
+    "Admission":{
+        "before_cancel": "hindustan.custom.cancellation_remarks_mandatory"
+    },
+    "Student":{
+        "validate":["hindustan.custom.student_doc_validation_method","hindustan.custom.validate_mail",
+                    # "hindustan.custom.create_enrollment_test"
+                    ],
+        'after_insert':["hindustan.custom.create_enrollment","hindustan.custom.update_student_number"]
+    },
+#     "Program Enrollment": {
+#         "on_submit": "hindustan.custom.create_student_group"
+#     }
+}
 
 # Scheduled Tasks
 # ---------------
@@ -165,9 +211,20 @@ app_license = "mit"
 # 		"hindustan.tasks.monthly"
 # 	],
 # }
+# hooks.py
 
+scheduler_events = {
+    "cron": {
+        "*/2 * * * *": [
+            "hindustan.custom.allocate_leaves_automatically"
+        ]
+    }
+}
 # Testing
 # -------
+override_doctype_class = {
+    "Fee Schedule":"hindustan.overrides.CustomFeeSchedule"
+}
 
 # before_tests = "hindustan.install.before_tests"
 

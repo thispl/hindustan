@@ -1,0 +1,140 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "ADV-FEE-.######",
+ "creation": "2024-12-23 18:09:20.417907",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "registration_number",
+  "student",
+  "student_name",
+  "column_break_rwua",
+  "institution",
+  "posting_date",
+  "posting_time",
+  "section_break_vfts",
+  "program",
+  "column_break_tlnh",
+  "academic_year",
+  "academic_term",
+  "advance_payments_section",
+  "advance_payment"
+ ],
+ "fields": [
+  {
+   "fieldname": "registration_number",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Registration Number",
+   "options": "Registration",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "label": "Student",
+   "options": "Student"
+  },
+  {
+   "fetch_from": "registration_number.institution_name",
+   "fieldname": "institution",
+   "fieldtype": "Link",
+   "label": "Institution",
+   "options": "Institute"
+  },
+  {
+   "fieldname": "column_break_rwua",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "default": "Now",
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_vfts",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "registration_number.program",
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "Program"
+  },
+  {
+   "fieldname": "column_break_tlnh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "registration_number.academic_year",
+   "fieldname": "academic_year",
+   "fieldtype": "Link",
+   "label": "Academic Year",
+   "options": "Academic Year"
+  },
+  {
+   "fetch_from": "student.custom_current_academic_term",
+   "fieldname": "academic_term",
+   "fieldtype": "Link",
+   "label": "Academic Term",
+   "options": "Academic Term"
+  },
+  {
+   "fetch_from": "registration_number.student_name",
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "label": "Student Name",
+   "length": 140,
+   "read_only": 1
+  },
+  {
+   "fieldname": "advance_payments_section",
+   "fieldtype": "Section Break",
+   "label": "Advance Payments"
+  },
+  {
+   "fieldname": "advance_payment",
+   "fieldtype": "Table",
+   "label": "Advance Payment",
+   "options": "Advance Payment"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-03 16:03:14.030540",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Advance Fees",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,153 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "CONC-.#####",
+ "creation": "2024-12-20 13:14:39.913250",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_si2l",
+  "amended_from",
+  "student",
+  "student_category",
+  "academic_year",
+  "academic_term",
+  "program",
+  "concession_amount",
+  "column_break_alcq",
+  "fees",
+  "fees_collection",
+  "concession_on",
+  "cancellation_remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_si2l",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Concession",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "student.custom_academic_year",
+   "fieldname": "academic_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Academic Year",
+   "options": "Academic Year",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "student.custom_current_academic_term",
+   "fieldname": "academic_term",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Academic Term",
+   "options": "Academic Term",
+   "read_only_depends_on": "eval:doc.student == 'r'",
+   "reqd": 1
+  },
+  {
+   "fieldname": "concession_amount",
+   "fieldtype": "Currency",
+   "label": "Concession Amount",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "student.custom_program",
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "Program",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "student.custom_student_category",
+   "fieldname": "student_category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student Category",
+   "options": "Student Category"
+  },
+  {
+   "fieldname": "column_break_alcq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "fees",
+   "fieldtype": "Link",
+   "label": "Fees",
+   "options": "Fees",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "cancellation_remarks",
+   "fieldtype": "Small Text",
+   "label": "Cancellation Remarks",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "fees_collection",
+   "fieldtype": "Link",
+   "label": "Fees Collection",
+   "options": "Fees Collection",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "concession_on",
+   "fieldtype": "Link",
+   "label": "Concession On",
+   "options": "Fee Category",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-01-24 19:22:26.660385",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Concession",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
