@@ -1,12 +1,15 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
- "autoname": "format:A-EVE-{#####}",
- "creation": "2024-12-13 15:35:58.061294",
+ "autoname": "field:admission_number",
+ "creation": "2025-03-22 15:14:38.696253",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "section_break_5c3z",
+  "naming_series",
   "registration_number",
   "spot_admission",
   "institution_name",
@@ -22,7 +25,6 @@
   "admission_number",
   "sem__batch",
   "accadamic_date",
-  "enabled",
   "section_break_gxai",
   "student",
   "student_name",
@@ -70,7 +72,6 @@
   "paid_amount",
   "excess_amount",
   "balance_due",
-  "amended_from",
   "category",
   "print_out",
   "family_details_section",
@@ -106,7 +107,6 @@
   "name_of_exam",
   "column_break_etmk",
   "mark_scored_in_",
-  "naming_series",
   "short_code",
   "section_break_anfo",
   "get_fees_structure",
@@ -114,12 +114,36 @@
   "fee_structure",
   "fees_structure",
   "section_break_peto",
-  "cancellation_remarks"
+  "cancellation_remarks",
+  "cancel_remark",
+  "amended_from"
  ],
  "fields": [
   {
    "fieldname": "section_break_5c3z",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "\nA/HAA/ .####\nA/HEA/ .####\nA/HBS/ .####"
+  },
+  {
+   "fieldname": "registration_number",
+   "fieldtype": "Link",
+   "label": "Registration Number ",
+   "mandatory_depends_on": "eval:doc.spot_admission==0",
+   "options": "Registration",
+   "read_only_depends_on": "eval:doc.spot_admission==1"
+  },
+  {
+   "default": "0",
+   "fieldname": "spot_admission",
+   "fieldtype": "Check",
+   "label": "Spot Admission ",
+   "read_only_depends_on": "eval:doc.registration_number"
   },
   {
    "fetch_from": "registration_number.institution_name",
@@ -132,11 +156,11 @@
    "reqd": 1
   },
   {
-   "default": "0",
-   "fieldname": "spot_admission",
-   "fieldtype": "Check",
-   "label": "Spot Admission ",
-   "read_only_depends_on": "eval:doc.registration_number"
+   "fieldname": "institutiyon_name_",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Institution Name ",
+   "options": "Institute"
   },
   {
    "fetch_from": "registration_number.course_name",
@@ -148,98 +172,19 @@
    "options": "Course"
   },
   {
-   "default": "Today",
-   "fieldname": "admission_date",
-   "fieldtype": "Date",
-   "label": "Admission Date "
-  },
-  {
-   "fieldname": "admission_number",
-   "fieldtype": "Data",
-   "label": "Admission Number"
-  },
-  {
-   "fetch_from": "registration_number.academic_term",
+   "fetch_from": "registration_number.program",
    "fetch_if_empty": 1,
-   "fieldname": "batch__semester",
+   "fieldname": "program",
    "fieldtype": "Link",
-   "label": "Academic Term",
-   "options": "Academic Term"
-  },
-  {
-   "fieldname": "institutiyon_name_",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Institution Name ",
-   "options": "Institute"
-  },
-  {
-   "fetch_from": "academic_year.year_start_date",
-   "fetch_if_empty": 1,
-   "fieldname": "accadamic_date",
-   "fieldtype": "Date",
-   "label": "Academic Date "
-  },
-  {
-   "fetch_from": "registration_number.student_category",
-   "fetch_if_empty": 1,
-   "fieldname": "student_category",
-   "fieldtype": "Link",
-   "label": "Student Category/Domicile",
-   "options": "Student Category",
+   "label": "Program",
+   "options": "Program",
    "reqd": 1
   },
   {
-   "fetch_from": "batch__semester.custom_semester",
-   "fetch_if_empty": 1,
-   "fieldname": "sem__batch",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Sem / Batch ",
-   "options": "\n1\n2\n3\n4\n5\n6\n7"
-  },
-  {
-   "fieldname": "remarks",
-   "fieldtype": "Small Text",
-   "label": "Remarks "
-  },
-  {
-   "fieldname": "fee_structure",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Fee Structure ",
-   "options": "Fee Structure"
-  },
-  {
-   "fetch_from": "registration_number.amount_paid",
-   "fetch_if_empty": 1,
-   "fieldname": "paid_amount_at_registration",
-   "fieldtype": "Currency",
-   "label": "Paid Amount at Registration ",
-   "read_only": 1
-  },
-  {
-   "fieldname": "payable_amount",
-   "fieldtype": "Currency",
-   "label": "Payable amount",
-   "read_only": 1
-  },
-  {
-   "fieldname": "date_of_course_commencement",
-   "fieldtype": "Date",
-   "label": "Date of Course Commencement "
-  },
-  {
-   "fieldname": "column_break_qvmz",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "registration_number",
-   "fieldtype": "Link",
-   "label": "Registration Number ",
-   "mandatory_depends_on": "eval:doc.spot_admission==0",
-   "options": "Registration",
-   "read_only_depends_on": "eval:doc.spot_admission==1"
+   "fetch_from": "program.custom_no_of_semesters",
+   "fieldname": "no_of_semesters",
+   "fieldtype": "Int",
+   "label": "No of Semesters"
   },
   {
    "fetch_from": "registration_number.academic_year",
@@ -251,6 +196,66 @@
    "reqd": 1
   },
   {
+   "fetch_from": "registration_number.academic_term",
+   "fetch_if_empty": 1,
+   "fieldname": "batch__semester",
+   "fieldtype": "Link",
+   "label": "Academic Term",
+   "options": "Academic Term"
+  },
+  {
+   "fieldname": "column_break_evqp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "admission_date",
+   "fieldtype": "Date",
+   "label": "Admission Date "
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "choose_letter_head",
+   "fieldtype": "Link",
+   "label": "Letter Head ",
+   "options": "Letter Head"
+  },
+  {
+   "fieldname": "admission_number",
+   "fieldtype": "Data",
+   "label": "Admission Number",
+   "unique": 1
+  },
+  {
+   "fetch_from": "batch__semester.custom_semester",
+   "fetch_if_empty": 1,
+   "fieldname": "sem__batch",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Sem / Batch ",
+   "options": "\n1\n2\n3\n4\n5\n6\n7"
+  },
+  {
+   "fetch_from": "academic_year.year_start_date",
+   "fetch_if_empty": 1,
+   "fieldname": "accadamic_date",
+   "fieldtype": "Date",
+   "label": "Academic Date "
+  },
+  {
+   "fieldname": "section_break_gxai",
+   "fieldtype": "Section Break",
+   "label": "Student Details"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "student",
+   "fieldtype": "Data",
+   "label": "Student",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
    "fetch_from": "registration_number.student_name",
    "fetch_if_empty": 1,
    "fieldname": "student_name",
@@ -267,26 +272,12 @@
    "reqd": 1
   },
   {
-   "fieldname": "place_of_birth",
-   "fieldtype": "Data",
-   "label": "Place of Birth "
-  },
-  {
-   "fieldname": "village",
-   "fieldtype": "Data",
-   "label": "Village "
-  },
-  {
-   "fieldname": "taluk",
-   "fieldtype": "Data",
-   "label": "Taluk "
-  },
-  {
-   "fetch_from": "registration_number.district",
+   "fetch_from": "registration_number.student_category",
    "fetch_if_empty": 1,
-   "fieldname": "district",
-   "fieldtype": "Data",
-   "label": "District",
+   "fieldname": "student_category",
+   "fieldtype": "Link",
+   "label": "Student Category/Domicile",
+   "options": "Student Category",
    "reqd": 1
   },
   {
@@ -299,22 +290,40 @@
    "reqd": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Admission",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
+   "fieldname": "place_of_birth",
+   "fieldtype": "Data",
+   "label": "Place of Birth "
   },
   {
-   "fetch_from": "registration_number.nationality",
+   "fetch_from": "registration_number.aadhar_number",
    "fetch_if_empty": 1,
-   "fieldname": "nationality",
-   "fieldtype": "Link",
-   "label": "Nationality",
-   "options": "Nationality",
+   "fieldname": "aadhar_number",
+   "fieldtype": "Data",
+   "label": "Aadhar Number"
+  },
+  {
+   "fieldname": "column_break_rmzq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Phone",
+   "label": "Phone Number"
+  },
+  {
+   "fetch_from": "registration_number.passport_number",
+   "fetch_if_empty": 1,
+   "fieldname": "passport_number",
+   "fieldtype": "Data",
+   "label": "Passport number"
+  },
+  {
+   "fetch_from": "registration_number.email",
+   "fetch_if_empty": 1,
+   "fieldname": "email_id",
+   "fieldtype": "Data",
+   "label": "Email-ID ",
+   "options": "Email",
    "reqd": 1
   },
   {
@@ -334,6 +343,111 @@
    "options": "Caste"
   },
   {
+   "fetch_from": "registration_number.sub_category",
+   "fetch_if_empty": 1,
+   "fieldname": "st_category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "Category"
+  },
+  {
+   "fetch_from": "registration_number.mother_tongue",
+   "fetch_if_empty": 1,
+   "fieldname": "mother_tongue",
+   "fieldtype": "Link",
+   "label": "Mother Tongue ",
+   "options": "Mother Tongue"
+  },
+  {
+   "fieldname": "column_break_qvmz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "registration_number.nationality",
+   "fetch_if_empty": 1,
+   "fieldname": "nationality",
+   "fieldtype": "Link",
+   "label": "Nationality",
+   "options": "Nationality",
+   "reqd": 1
+  },
+  {
+   "default": "India",
+   "fetch_from": "registration_number.country",
+   "fetch_if_empty": 1,
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "registration_number.state",
+   "fetch_if_empty": 1,
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State ",
+   "options": "State",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "registration_number.district",
+   "fetch_if_empty": 1,
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District",
+   "reqd": 1
+  },
+  {
+   "fieldname": "taluk",
+   "fieldtype": "Data",
+   "label": "Taluk "
+  },
+  {
+   "fieldname": "village",
+   "fieldtype": "Data",
+   "label": "Village "
+  },
+  {
+   "fieldname": "pin_code",
+   "fieldtype": "Data",
+   "label": "Pin Code"
+  },
+  {
+   "fieldname": "admission_fee_details_section",
+   "fieldtype": "Section Break",
+   "label": "Admission Fee Details"
+  },
+  {
+   "fieldname": "date_of_course_commencement",
+   "fieldtype": "Date",
+   "label": "Date of Course Commencement "
+  },
+  {
+   "fetch_from": "registration_number.amount_paid",
+   "fetch_if_empty": 1,
+   "fieldname": "paid_amount_at_registration",
+   "fieldtype": "Currency",
+   "label": "Paid Amount at Registration ",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "registration_pending",
+   "fieldtype": "Check",
+   "label": "Registration Pending",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.registration_pending==1",
+   "fetch_from": "registration_number.outstanding_amount",
+   "fetch_if_empty": 1,
+   "fieldname": "due_in_registration",
+   "fieldtype": "Currency",
+   "label": "Due in registration ",
+   "read_only": 1
+  },
+  {
    "default": "0",
    "fieldname": "concession",
    "fieldtype": "Check",
@@ -347,12 +461,96 @@
    "mandatory_depends_on": "eval:doc.concession==1"
   },
   {
-   "depends_on": "eval:doc.registration_pending==1",
-   "fetch_from": "registration_number.outstanding_amount",
+   "fetch_from": "registration_number.payment_mode",
    "fetch_if_empty": 1,
-   "fieldname": "due_in_registration",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode ",
+   "options": "\nDD\nCheque\nCash\nMO\nOnline Transfer\nGPAY / QR Code"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode!='Cash' && doc.payment_mode!=''",
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode!='Cash' && doc.payment_mode!=''",
+   "fetch_from": "bank_name.bank_account_no",
+   "fieldname": "account_number",
+   "fieldtype": "Data",
+   "label": "Account Number",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.payment_mode ==\"DD\"",
+   "fieldname": "dd_date",
+   "fieldtype": "Date",
+   "label": "DD Date"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode ==\"DD\"",
+   "fieldname": "dd_number",
+   "fieldtype": "Data",
+   "label": "DD Number"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='Cheque'",
+   "fieldname": "cheque_date",
+   "fieldtype": "Date",
+   "label": "Cheque Date"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='Cheque'",
+   "fieldname": "cheque_number",
+   "fieldtype": "Data",
+   "label": "Cheque Number"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='GPAY / QR Code'",
+   "fieldname": "upi_id",
+   "fieldtype": "Data",
+   "label": "UPI ID"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode=='GPAY / QR Code' || doc.payment_mode=='Online Transfer' || doc.payment_mode ==\"MO\"",
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "fieldname": "column_break_znzl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date",
+   "mandatory_depends_on": "eval:doc.payment_mode ==\"Cash\""
+  },
+  {
+   "fieldname": "admission_amount",
    "fieldtype": "Currency",
-   "label": "Due in registration ",
+   "label": "Admission Amount"
+  },
+  {
+   "fieldname": "payable_amount",
+   "fieldtype": "Currency",
+   "label": "Payable amount",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount"
+  },
+  {
+   "depends_on": "eval:doc.payable_amount<doc.paid_amount",
+   "fieldname": "excess_amount",
+   "fieldtype": "Currency",
+   "label": "Excess Amount",
    "read_only": 1
   },
   {
@@ -363,12 +561,14 @@
    "read_only": 1
   },
   {
-   "fetch_from": "registration_number.payment_mode",
-   "fetch_if_empty": 1,
-   "fieldname": "payment_mode",
-   "fieldtype": "Select",
-   "label": "Payment Mode ",
-   "options": "\nDD\nCheque\nCash\nMO\nOnline Transfer\nGPAY / QR Code"
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Admission",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "fieldname": "category",
@@ -378,24 +578,9 @@
    "options": "\nCash\nCheque\nBank Transfer\nCredit Card\nDebit Card\nOnline Payment Gateway\nOthers"
   },
   {
-   "fetch_from": "registration_number.mother_tongue",
-   "fetch_if_empty": 1,
-   "fieldname": "mother_tongue",
-   "fieldtype": "Link",
-   "label": "Mother Tongue ",
-   "options": "Mother Tongue"
-  },
-  {
    "fieldname": "print_out",
    "fieldtype": "Button",
    "label": "Print Out "
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "choose_letter_head",
-   "fieldtype": "Link",
-   "label": "Letter Head ",
-   "options": "Letter Head"
   },
   {
    "fieldname": "family_details_section",
@@ -429,14 +614,6 @@
    "fieldname": "guardian_phone_number",
    "fieldtype": "Phone",
    "label": "Guardian Phone Number ",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "registration_number.email",
-   "fetch_if_empty": 1,
-   "fieldname": "email_id",
-   "fieldtype": "Data",
-   "label": "Email-ID ",
    "reqd": 1
   },
   {
@@ -478,13 +655,6 @@
    "label": "Communication Address"
   },
   {
-   "fetch_from": "registration_number.aadhar_number",
-   "fetch_if_empty": 1,
-   "fieldname": "aadhar_number",
-   "fieldtype": "Data",
-   "label": "Aadhar Number"
-  },
-  {
    "fieldname": "education_details_section",
    "fieldtype": "Section Break",
    "hidden": 1,
@@ -506,28 +676,21 @@
    "label": "University Name "
   },
   {
-   "fetch_from": "registration_number.state",
-   "fetch_if_empty": 1,
-   "fieldname": "state",
-   "fieldtype": "Link",
-   "label": "State ",
-   "options": "State",
-   "reqd": 1
-  },
-  {
-   "default": "India",
-   "fetch_from": "registration_number.country",
-   "fetch_if_empty": 1,
-   "fieldname": "country",
-   "fieldtype": "Link",
-   "label": "Country",
-   "options": "Country",
-   "reqd": 1
-  },
-  {
    "fieldname": "year_of_pass",
    "fieldtype": "Data",
    "label": "Year of Pass "
+  },
+  {
+   "fieldname": "state_of_institude",
+   "fieldtype": "Data",
+   "label": "State of Institude"
+  },
+  {
+   "default": "India",
+   "fieldname": "institude_country",
+   "fieldtype": "Link",
+   "label": "Institude Country",
+   "options": "Country"
   },
   {
    "fieldname": "column_break_unoa",
@@ -593,42 +756,12 @@
    "label": "Mark Scored in % "
   },
   {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Naming Series",
-   "no_copy": 1,
-   "options": "\nA/HAA/ .####\nA/HEA/ .####\nA/HBS/ .####",
-   "set_only_once": 1
-  },
-  {
    "fetch_from": "institution_name.institute_short_code",
    "fetch_if_empty": 1,
    "fieldname": "short_code",
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Short Code"
-  },
-  {
-   "default": "0",
-   "fieldname": "registration_pending",
-   "fieldtype": "Check",
-   "label": "Registration Pending",
-   "read_only": 1
-  },
-  {
-   "fieldname": "admission_amount",
-   "fieldtype": "Currency",
-   "label": "Admission Amount"
-  },
-  {
-   "fetch_from": "registration_number.program",
-   "fetch_if_empty": 1,
-   "fieldname": "program",
-   "fieldtype": "Link",
-   "label": "Program",
-   "options": "Program",
-   "reqd": 1
   },
   {
    "fieldname": "section_break_anfo",
@@ -641,35 +774,21 @@
    "label": "Get Fees Structure"
   },
   {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks "
+  },
+  {
+   "fieldname": "fee_structure",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Fee Structure ",
+   "options": "Fee Structure"
+  },
+  {
    "fieldname": "fees_structure",
    "fieldtype": "HTML",
    "label": "Fees Structure"
-  },
-  {
-   "fieldname": "column_break_rmzq",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "admission_fee_details_section",
-   "fieldtype": "Section Break",
-   "label": "Admission Fee Details"
-  },
-  {
-   "fieldname": "column_break_znzl",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "paid_amount",
-   "fieldtype": "Currency",
-   "label": "Paid Amount"
-  },
-  {
-   "depends_on": "eval:doc.payable_amount<doc.paid_amount",
-   "fieldname": "excess_amount",
-   "fieldtype": "Currency",
-   "label": "Excess Amount",
-   "read_only": 1
   },
   {
    "fieldname": "section_break_peto",
@@ -683,144 +802,62 @@
    "read_only": 1
   },
   {
-   "fieldname": "phone_number",
-   "fieldtype": "Phone",
-   "label": "Phone Number"
-  },
-  {
-   "fetch_from": "registration_number.sub_category",
-   "fetch_if_empty": 1,
-   "fieldname": "st_category",
+   "fieldname": "amended_from",
    "fieldtype": "Link",
-   "label": "Category",
-   "options": "Category"
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Admission",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   },
   {
-   "fieldname": "pin_code",
-   "fieldtype": "Data",
-   "label": "Pin Code",
-   "reqd": 1
-  },
-  {
-   "fieldname": "state_of_institude",
-   "fieldtype": "Data",
-   "label": "State of Institude"
-  },
-  {
-   "default": "India",
-   "fieldname": "institude_country",
-   "fieldtype": "Link",
-   "label": "Institude Country",
-   "options": "Country"
-  },
-  {
-   "depends_on": "eval:doc.payment_mode!='Cash' && doc.payment_mode!=''",
-   "fetch_from": "bank_name.bank_account_no",
-   "fieldname": "account_number",
-   "fieldtype": "Data",
-   "label": "Account Number",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.payment_mode=='Cheque'",
-   "fieldname": "cheque_number",
-   "fieldtype": "Data",
-   "label": "Cheque Number"
-  },
-  {
-   "depends_on": "eval:doc.payment_mode=='GPAY / QR Code'",
-   "fieldname": "upi_id",
-   "fieldtype": "Data",
-   "label": "UPI ID"
-  },
-  {
-   "depends_on": "eval:doc.payment_mode=='GPAY / QR Code' || doc.payment_mode=='Online Transfer' || doc.payment_mode ==\"MO\"",
-   "fieldname": "reference_number",
-   "fieldtype": "Data",
-   "label": "Reference Number"
-  },
-  {
-   "depends_on": "eval:doc.payment_mode!='Cash' && doc.payment_mode!=''",
-   "fieldname": "bank_name",
-   "fieldtype": "Link",
-   "label": "Bank Account",
-   "options": "Bank Account"
-  },
-  {
-   "fieldname": "section_break_gxai",
-   "fieldtype": "Section Break",
-   "label": "Student Details"
-  },
-  {
-   "fieldname": "column_break_evqp",
-   "fieldtype": "Column Break"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "student",
-   "fieldtype": "Data",
-   "label": "Student",
-   "options": "Student",
-   "read_only": 1
-  },
-  {
-   "fieldname": "payment_date",
-   "fieldtype": "Date",
-   "label": "Payment Date",
-   "mandatory_depends_on": "eval:doc.payment_mode ==\"Cash\""
-  },
-  {
-   "fetch_from": "program.custom_no_of_semesters",
-   "fieldname": "no_of_semesters",
-   "fieldtype": "Int",
-   "label": "No of Semesters",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.payment_mode ==\"DD\"",
-   "fieldname": "dd_number",
-   "fieldtype": "Data",
-   "label": "DD Number"
-  },
-  {
-   "depends_on": "eval:doc.payment_mode ==\"DD\"",
-   "fieldname": "dd_date",
-   "fieldtype": "Date",
-   "label": "DD Date"
-  },
-  {
-   "depends_on": "eval:doc.payment_mode=='Cheque'",
-   "fieldname": "cheque_date",
-   "fieldtype": "Date",
-   "label": "Cheque Date"
-  },
-  {
-   "allow_on_submit": 1,
    "default": "0",
-   "fieldname": "enabled",
+   "fieldname": "cancel_remark",
    "fieldtype": "Check",
-   "ignore_user_permissions": 1,
-   "label": "Disabled",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "registration_number.passport_number",
-   "fetch_if_empty": 1,
-   "fieldname": "passport_number",
-   "fieldtype": "Data",
-   "label": "Passport number"
+   "hidden": 1,
+   "label": "Cancel Remark"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-07 13:07:32.287532",
+ "modified": "2025-07-04 12:03:18.262623",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "Admission",
- "naming_rule": "Expression",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Academics User",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "student_name",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

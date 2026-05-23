@@ -6,10 +6,32 @@ frappe.ui.form.on("Promotion And Transfer", {
 		frm.set_query('promotion_sem__batch', function() {
 			return {
 				'filters':{
-					'academic_year': frm.doc.promotion_academic_year
+					'academic_year': frm.doc.promotion_academic_year,
+                    'program':frm.doc.program
 				}
 			};
 		});
+        frm.set_query('transfered_program', function() {
+			return {
+				'filters':{
+					'custom_institute_name':frm.doc.transfered_institute_name
+				}
+			};
+		});
+        
+        frm.set_query('transfered_sembatch', function() {
+			return {
+				'filters':{
+					'academic_year':frm.doc.transfered_academic_year,
+                    "program":frm.doc.transfered_program
+				}
+			};
+		});
+    },
+    student_category(frm){
+        if(frm.doc.student_category && frm.doc.transfered_student_category){
+            frm.set_value('transfered_student_category',"")
+        }
     },
     before_save(frm){
         if(frm.doc.promotion__transfer==1){
@@ -80,30 +102,59 @@ frappe.ui.form.on("Promotion And Transfer", {
             
         }
         else if(!frm.doc.student_id__admission_id){
-            frappe.call({
-                method:"hindustan.hindustan.doctype.promotion_and_transfer.promotion_and_transfer.get_student_details",
-                args:{
-                    inst_name:frm.doc.institute_name,
-                    program:frm.doc.program,
-                    year:frm.doc.academic_year,
-                    sem:frm.doc.batchsem
-                },
-                callback(r){
-                    if(r.message){
-                        frm.clear_table("student_promotion");
-                        $.each(r.message, function (i, student) {
-                            let child = frm.add_child("student_promotion");
-                            child.student_id__admission_id = student[0];
-                            child.program = student[1];
-                            child.batchsem = student[2]; 
-                            // child.section = student[3]; 
-                        });
-                        frm.save()
-                        frm.refresh_field("student_promotion");
+            if(frm.doc.institute_name && frm.doc.program && frm.doc.academic_year && frm.doc.batchsem && !(frm.doc.student_category)){
+                frappe.call({
+                    method:"hindustan.hindustan.doctype.promotion_and_transfer.promotion_and_transfer.get_student_details",
+                    args:{
+                        inst_name:frm.doc.institute_name,
+                        program:frm.doc.program,
+                        year:frm.doc.academic_year,
+                        sem:frm.doc.batchsem
+                    },
+                    callback(r){
+                        if(r.message){
+                            frm.clear_table("student_promotion");
+                            $.each(r.message, function (i, student) {
+                                let child = frm.add_child("student_promotion");
+                                child.student_id__admission_id = student[0];
+                                child.program = student[1];
+                                child.batchsem = student[2]; 
+                                // child.section = student[3]; 
+                            });
+                            frm.save()
+                            frm.refresh_field("student_promotion");
+                        }
+                        
                     }
-                    
-                }
-            })
+                })
+            }
+            else if(frm.doc.institute_name && frm.doc.program && frm.doc.academic_year && frm.doc.batchsem && frm.doc.student_category){
+                frappe.call({
+                    method:"hindustan.hindustan.doctype.promotion_and_transfer.promotion_and_transfer.get_student_details_for_transfer",
+                    args:{
+                        inst_name:frm.doc.institute_name,
+                        program:frm.doc.program,
+                        year:frm.doc.academic_year,
+                        sem:frm.doc.batchsem,
+                        student_category:frm.doc.student_category
+                    },
+                    callback(r){
+                        if(r.message){
+                            frm.clear_table("student_promotion");
+                            $.each(r.message, function (i, student) {
+                                let child = frm.add_child("student_promotion");
+                                child.student_id__admission_id = student[0];
+                                child.program = student[1];
+                                child.batchsem = student[2]; 
+                                // child.section = student[3]; 
+                            });
+                            frm.save()
+                            frm.refresh_field("student_promotion");
+                        }
+                        
+                    }
+                })
+            }
         }
     },
     get_student(frm){

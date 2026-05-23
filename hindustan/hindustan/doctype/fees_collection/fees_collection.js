@@ -4,7 +4,21 @@
 frappe.provide("erpnext.accounts.dimensions");
 
 frappe.ui.form.on("Fees Collection", {
-
+	after_insert: function(frm){
+		frappe.call({
+			method: "hindustan.hindustan.doctype.fees_collection.fees_collection.get_rec_no",
+			callback(r){
+				if (r.message){
+					frm.set_value("receipt_number",r.message)
+				}
+				else{
+					frm.set_value("receipt_number",'')
+				}
+			}
+		})
+		frm.save()
+		frm.reload_doc()
+	},
 	company: function(frm) {
 		erpnext.accounts.dimensions.update_dimension(frm, frm.doctype);
 	},
@@ -56,11 +70,24 @@ frappe.ui.form.on("Fees Collection", {
                 filters: { fees: frm.doc.fees }
             };
         });
-		
+		if (!frm.doc.receipt_number){
+			frappe.call({
+				method: "hindustan.hindustan.doctype.fees_collection.fees_collection.get_rec_no",
+				callback(r){
+					if (r.message){
+						frm.set_value("receipt_number",r.message)
+					}
+					else{
+						frm.set_value("receipt_number",'')
+					}
+				}
+			})
+		}
 		frm.set_query("academic_term", function() {
 			return{
 				"filters": {
-					"academic_year": (frm.doc.academic_year)
+					"academic_year": (frm.doc.academic_year) ,
+					"program": frm.doc.program
 				}
 			};
 		});
@@ -69,6 +96,8 @@ frappe.ui.form.on("Fees Collection", {
 				"filters":{
 					"academic_year": frm.doc.academic_year,
 					"program": frm.doc.program,
+					"academic_term": frm.doc.academic_term,
+					"student_category" : frm.doc.custom_student_category,
 					"docstatus": 1
 				}
 			};
@@ -108,6 +137,9 @@ frappe.ui.form.on("Fees Collection", {
 		erpnext.accounts.dimensions.setup_dimension_filters(frm, frm.doctype);
 	},
 	validate: function(frm) {
+		if (!frm.doc.pay_advance){
+			frm.set_value('excess_amount',0)
+		}
 		frm.trigger('calculate_paying_amount')
 	},
 	on_submit: function(frm) {
@@ -129,6 +161,9 @@ frappe.ui.form.on("Fees Collection", {
 			},
 			() => frappe.msgprint(__('Outstanding Amount updated Successfully')),
 		]);
+
+		
+		
 	},	
 	
 	refresh: function(frm) {
@@ -298,12 +333,12 @@ frappe.ui.form.on("Fees Collection", {
 	},
 
 	calculate_paying_amount: function(frm) {
-		var paying_amount = 0;
-		for(var i=0;i<frm.doc.components.length;i++) {
-			paying_amount += frm.doc.components[i].paying_amount;
-		}
-		frm.set_value("paying_amount", paying_amount);
-	},
+        var paying_amount = 0;
+        (frm.doc.components || []).forEach(component => {
+            paying_amount += component.paying_amount || 0;
+        });
+        frm.set_value("paying_amount", paying_amount);
+    },
 	
 	program(frm) {
 		if (frm.doc.program && frm.doc.academic_term && frm.doc.academic_year) {
@@ -330,7 +365,7 @@ frappe.ui.form.on("Fees Collection", {
 											new_row.reference_number = row.reference_number;
 											new_row.date = row.date;
 											new_row.adjusted = row.adjusted;
-											new_row.received_amount = row.received_amount;
+											new_row.received_amount = row.balance_amount;
 											new_row.balance_amount = row.balance_amount
 										}
 									});
@@ -354,21 +389,67 @@ frappe.ui.form.on("Fees Collection", {
 			frm.save();
 		}, 500);
 	},
+	// adjust_advance: function(frm) {
+	// 	if (!frm.doc.advance_payment || !frm.doc.components) {
+	// 		frappe.msgprint(__('Advance Payment or Components table is missing.'));
+	// 		return;
+	// 	}
+	
+	// 	if (frm.doc.advance_payment.length > 0) {
+	// 		let rec_amt = 0;
+	// 		let adj_amt = 0;
+	
+	// 		frm.doc.advance_payment.forEach(row => {
+	// 			rec_amt += row.received_amount || 0;
+	// 		});
+	
+	// 		frm.doc.components.forEach(child => {
+	// 			if (child.outstanding_amount > 0) {
+	// 				if (rec_amt >= child.outstanding_amount) {
+	// 					child.paying_amount = child.outstanding_amount;
+	// 					rec_amt -= child.outstanding_amount;
+	// 				} else {
+	// 					child.paying_amount = rec_amt;
+	// 					rec_amt = 0;
+	// 				}
+	// 				adj_amt += child.paying_amount || 0;
+	// 			}
+	// 		});
+	
+	// 		let total_received = frm.doc.advance_payment.reduce((sum, row) => sum + (row.received_amount || 0), 0);
+	// 		frm.doc.advance_payment.forEach(row => {
+	// 			row.adjusted_amount = total_received ? (row.received_amount / total_received) * adj_amt : 0;
+	// 			row.adjusted = row.received_amount === row.adjusted_amount;
+				
+	// 		});
+	
+	// 		frm.refresh_field('components');
+	// 		frm.refresh_field('advance_payment');
+	// 	}
+	// },
+
 	adjust_advance: function(frm) {
 		if (!frm.doc.advance_payment || !frm.doc.components) {
 			frappe.msgprint(__('Advance Payment or Components table is missing.'));
 			return;
 		}
-	
+
 		if (frm.doc.advance_payment.length > 0) {
 			let rec_amt = 0;
 			let adj_amt = 0;
-	
+
+			// Step 1: Calculate Total Advance Amount Available
 			frm.doc.advance_payment.forEach(row => {
 				rec_amt += row.received_amount || 0;
 			});
-	
-			frm.doc.components.forEach(child => {
+
+			// Step 2: Clear previous paying_amount
+			(frm.doc.components || []).forEach(child => {
+				child.paying_amount = 0;
+			});
+
+			// Step 3: Adjust against Fee Components
+			(frm.doc.components || []).forEach(child => {
 				if (child.outstanding_amount > 0) {
 					if (rec_amt >= child.outstanding_amount) {
 						child.paying_amount = child.outstanding_amount;
@@ -380,17 +461,27 @@ frappe.ui.form.on("Fees Collection", {
 					adj_amt += child.paying_amount || 0;
 				}
 			});
-	
-			let total_received = frm.doc.advance_payment.reduce((sum, row) => sum + (row.received_amount || 0), 0);
+
+			// Step 4: Allocate Adjusted Amount across Advance rows proportionally
+			let total_received = frm.doc.advance_payment.reduce((sum, row) => sum + (row.balance_amount || 0), 0);
+
 			frm.doc.advance_payment.forEach(row => {
-				row.adjusted_amount = total_received ? (row.received_amount / total_received) * adj_amt : 0;
-				row.adjusted = row.received_amount === row.adjusted_amount;
+				let share_ratio = row.balance_amount / total_received;
+				let adjusted_amt = share_ratio * adj_amt;
+
+				row.adjusted_amount = adjusted_amt;
+				row.received_amount=row.balance_amount;
+				row.balance_amount = row.received_amount - adjusted_amt;
+				row.adjusted = row.balance_amount <= 0.001;  // true if fully adjusted
+				
 			});
-	
-			frm.refresh_field('components');
+
+			// Refresh fields
 			frm.refresh_field('advance_payment');
+			frm.refresh_field('components');
 		}
-	},
+},
+
 	
 	concession_amount(frm) {
 		frm.save();
@@ -401,7 +492,27 @@ frappe.ui.form.on("Fees Collection", {
         	frm.trigger('get_program_enrollment');
 		}
     },
-
+	admission_number(frm){
+		if(frm.doc.admission_number){
+			frappe.call({
+                method: "frappe.client.get_value",
+                args: {
+                    doctype: "Student",
+                    filters: {
+                        custom_admission_number: frm.doc.admission_number
+                    },
+                    fieldname: "name"
+                },
+				
+                callback: function(r) {
+                    if (r.message) {
+                        frm.set_value("student", r.message.name);
+                    } 
+                }
+            });
+		}
+		
+	},
     get_program_enrollment: function(frm) {
         
             frappe.db.get_value('Fees',

@@ -77,8 +77,10 @@ app_license = "mit"
 jinja = {
     "methods":[
         "hindustan.hindustan.doctype.report_dashboard.consolidated_salary_statement.print_consolidated_salary",
-        "hindustan.custom.format_currency",
-        "hindustan.custom.add_suffix_to_date"
+        "hindustan.salary_slip_custom.format_currency",
+        "hindustan.admission_custom.add_suffix_to_date",
+        "hindustan.hindustan.doctype.report_dashboard.salary_register.get_salary_register_data_for_jinja",
+        "hindustan.hindustan.doctype.report_dashboard.consolidated_report.get_consolidated_statement_data_for_jinja",
     ]
 	# "methods": "hindustan.utils.jinja_methods",
 # 	"filters": "hindustan.utils.jinja_filters"
@@ -150,45 +152,58 @@ doc_events = {
 	# }
     "Employee": {
         "after_insert": [
-            "hindustan.custom.teaching_type"  
+            "hindustan.employee_custom.teaching_type"  
         ],
         "on_update": [
-            "hindustan.custom.teaching_type"  
+            "hindustan.employee_custom.teaching_type"  
         ],
         "validate":[
-            "hindustan.custom.employee_doc_validation_method"
+            "hindustan.employee_custom.employee_doc_validation_method"
         ]
     },
     "Fee Structure":{
-        "on_submit":'hindustan.custom.create_update_overall_fee_structure',
-		"on_cancel":'hindustan.custom.create_update_overall_fee_structure'
+        "on_submit":'hindustan.fee_str_custom.create_update_overall_fee_structure',
+		"on_cancel":'hindustan.fee_str_custom.create_update_overall_fee_structure'
   	},
     "Payment Entry": {
-        "on_submit": "hindustan.custom.create_student_log_on_payment",
-        "on_cancel": "hindustan.custom.delete_student_log_on_payment"
+        "on_submit": "hindustan.payment_entry_custom.create_student_log_on_payment",
+        "on_cancel": "hindustan.payment_entry_custom.delete_student_log_on_payment"
     },
     "Fees": {
         "validate": [
-            "hindustan.custom.validate_advance_payments",
-            "hindustan.custom.validate_outstanding_amount",
+            "hindustan.fees_custom.validate_advance_payments",
+            "hindustan.fees_custom.validate_outstanding_amount",
+            # "hindustan.custom.program_change_check",
         ],
+        "on_update_after_submit":[
+            "hindustan.fees_custom.validate_advance_payments",
+            "hindustan.fees_custom.validate_outstanding_amount",
+            # "hindustan.custom.program_change_check",
+        ],
+        "before_insert":"hindustan.fees_custom.program_change_check",
         # "on_submit": ["hindustan.custom.create_fees_collection_for_registration"]
     },
 	"Leave Application":{
-		"validate": ['hindustan.custom.leave_restriction_el_after','hindustan.custom.leave_restriction_el_before','hindustan.custom.leave_restriction_combining_after','hindustan.custom.leave_restriction_combining_before'],
+		"validate": ['hindustan.leave_app_custom.leave_restriction_el_after','hindustan.leave_app_custom.leave_restriction_el_before','hindustan.leave_app_custom.leave_restriction_combining_after','hindustan.leave_app_custom.leave_restriction_combining_before'],
 	},
     "Admission":{
-        "before_cancel": "hindustan.custom.cancellation_remarks_mandatory"
+        "before_cancel": "hindustan.admission_custom.cancellation_remarks_mandatory"
+    },
+    "Salary Slip":{
+        "after_insert": "hindustan.salary_slip_custom.update_earned_basic"
     },
     "Student":{
-        "validate":["hindustan.custom.student_doc_validation_method","hindustan.custom.validate_mail",
+        "validate":["hindustan.stud_custom.student_doc_validation_method","hindustan.stud_custom.validate_mail",
                     # "hindustan.custom.create_enrollment_test"
                     ],
-        'after_insert':["hindustan.custom.create_enrollment","hindustan.custom.update_student_number"]
+        'after_insert':["hindustan.stud_custom.create_enrollment","hindustan.stud_custom.update_student_number",'hindustan.stud_custom.update_receiving_person']
     },
-#     "Program Enrollment": {
-#         "on_submit": "hindustan.custom.create_student_group"
-#     }
+    "Receiving Person": {
+        "after_insert": "hindustan.receiving_person_custom.rename_receiver"
+    },
+    'Academic Term':{
+        "validate": "hindustan.acad_term_custom.check_academic_term"
+    }
 }
 
 # Scheduled Tasks
@@ -216,14 +231,16 @@ doc_events = {
 scheduler_events = {
     "cron": {
         "*/2 * * * *": [
-            "hindustan.custom.allocate_leaves_automatically"
+            "hindustan.leave_all_custom.allocate_leaves_automatically"
         ]
     }
 }
 # Testing
 # -------
 override_doctype_class = {
-    "Fee Schedule":"hindustan.overrides.CustomFeeSchedule"
+    "Fee Schedule":"hindustan.overrides.CustomFeeSchedule",
+    "Salary Slip":"hindustan.overrides.CustomSalarySlip",
+
 }
 
 # before_tests = "hindustan.install.before_tests"

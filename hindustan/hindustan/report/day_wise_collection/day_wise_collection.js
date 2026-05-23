@@ -42,6 +42,19 @@ frappe.query_reports["Day Wise Collection"] = {
 			"options": "Student"
 		},
 		{
+			"label": __("Admission"),
+			"fieldname": "admission",
+			"fieldtype": "Link",
+			"options": "Admission",
+			"get_query": function() {
+				return {
+					filters: {
+						"docstatus": 1 // Only show submitted Admission documents
+					}
+				};
+			}
+		},
+		{
 			"label": __("Academic Year"),
 			"fieldname": "academic_wise",
 			"fieldtype": "Link",

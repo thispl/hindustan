@@ -14,19 +14,21 @@
   "column_break_ubjp",
   "transfer",
   "section_break_tp9h",
-  "academic_year",
   "student_id__admission_id",
   "student_name",
   "institute_name",
   "program",
+  "academic_year",
   "batchsem",
+  "student_category",
   "section",
   "promotion_academic_year",
   "promotion_sem__batch",
-  "transfered_academic_year",
-  "transfered_sembatch",
   "transfered_institute_name",
   "transfered_program",
+  "transfered_academic_year",
+  "transfered_sembatch",
+  "transfered_student_category",
   "get_students",
   "get_student",
   "student_promotion",
@@ -57,10 +59,14 @@
   },
   {
    "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fetch_from": "student_id__admission_id.custom_academic_year",
+   "fetch_if_empty": 1,
    "fieldname": "academic_year",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Academic Year ",
-   "options": "Academic Year"
+   "options": "Academic Year",
+   "reqd": 1
   },
   {
    "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
@@ -68,8 +74,10 @@
    "fetch_if_empty": 1,
    "fieldname": "institute_name",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Institute Name ",
-   "options": "Institute"
+   "options": "Institute",
+   "reqd": 1
   },
   {
    "depends_on": "eval:doc.promotion__transfer==1 || doc.transfer==1",
@@ -84,8 +92,10 @@
    "fetch_if_empty": 1,
    "fieldname": "program",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Program",
-   "options": "Program"
+   "options": "Program",
+   "reqd": 1
   },
   {
    "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
@@ -93,8 +103,10 @@
    "fetch_if_empty": 1,
    "fieldname": "batchsem",
    "fieldtype": "Link",
-   "label": "Batch/Sem ",
-   "options": "Academic Term"
+   "in_list_view": 1,
+   "label": "Academic Term",
+   "options": "Academic Term",
+   "reqd": 1
   },
   {
    "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
@@ -135,7 +147,7 @@
    "options": "Student Promotion"
   },
   {
-   "depends_on": "eval:!doc.student_id__admission_i&&doc.promotion__transfer==1 || doc.transfer==1",
+   "depends_on": "eval:!doc.student_id__admission_id&&doc.promotion__transfer==1 || doc.transfer==1",
    "fieldname": "get_students",
    "fieldtype": "Button",
    "label": "Get Students"
@@ -153,13 +165,15 @@
    "fieldname": "transfered_academic_year",
    "fieldtype": "Link",
    "label": "Transfered Academic year",
+   "mandatory_depends_on": "eval:doc.transfer==1",
    "options": "Academic Year"
   },
   {
    "depends_on": "eval:doc.transfer==1",
    "fieldname": "transfered_sembatch",
    "fieldtype": "Link",
-   "label": "Transfered Sem/Batch",
+   "label": "Transfered Academic Term",
+   "mandatory_depends_on": "eval:doc.transfer==1",
    "options": "Academic Term"
   },
   {
@@ -167,6 +181,7 @@
    "fieldname": "transfered_institute_name",
    "fieldtype": "Link",
    "label": "Transfered Institute Name",
+   "mandatory_depends_on": "eval:doc.transfer==1",
    "options": "Institute"
   },
   {
@@ -174,6 +189,7 @@
    "fieldname": "transfered_program",
    "fieldtype": "Link",
    "label": "Transfered Program",
+   "mandatory_depends_on": "eval:doc.transfer==1",
    "options": "Program"
   },
   {
@@ -213,12 +229,29 @@
    "fieldtype": "Data",
    "label": "Student Name",
    "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.promotion__transfer==1 || doc.promotion_via_assessment==1 || doc.transfer==1",
+   "fetch_from": "student_id__admission_id.custom_student_category",
+   "fetch_if_empty": 1,
+   "fieldname": "student_category",
+   "fieldtype": "Link",
+   "label": "Student Category",
+   "options": "Student Category"
+  },
+  {
+   "depends_on": "eval:doc.transfer==1 && doc.student_category",
+   "fieldname": "transfered_student_category",
+   "fieldtype": "Link",
+   "label": "Transfered Student Category",
+   "mandatory_depends_on": "eval:doc.transfer==1 && doc.student_category && !doc.student_id__admission_id",
+   "options": "Student Category"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-20 13:09:51.511629",
+ "modified": "2025-06-23 12:19:42.671462",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "Promotion And Transfer",

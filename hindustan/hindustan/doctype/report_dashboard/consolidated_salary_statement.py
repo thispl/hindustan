@@ -48,19 +48,19 @@ def make_xlsx_css(sheet_name="CONSOLIDATED SALARY STATEMENT", wb=None):
     if institute:
         ws.append([f"{institute}"])
     else:
-        ws.append(["HINDUSTAN ACADEMY"])
+        ws.append(["EVEHANS ACADEMY - BANGALORE "])
     ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=6)
     ws.cell(row=1, column=1).alignment = Alignment(horizontal='center', vertical='center')
 
-    ws.append(["BANGALORE"])
-    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=6)
-    ws.cell(row=2, column=1).alignment = Alignment(horizontal='center', vertical='center')
+    # ws.append(["BANGALORE"])
+    # ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=6)
+    # ws.cell(row=2, column=1).alignment = Alignment(horizontal='center', vertical='center')
 
     month_year = from_date.strftime('%B %Y')
     month_year=str(month_year).upper()
     ws.append([f"CONSOLIDATED SALARY STATEMENT FOR THE MONTH - {month_year}"])
-    ws.merge_cells(start_row=3, start_column=1, end_row=3, end_column=6)
-    ws.cell(row=3, column=1).alignment = Alignment(horizontal='center', vertical='center')
+    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=6)
+    ws.cell(row=2, column=1).alignment = Alignment(horizontal='center', vertical='center')
 
     # Adding sub-header
     sub_header = [
@@ -68,7 +68,7 @@ def make_xlsx_css(sheet_name="CONSOLIDATED SALARY STATEMENT", wb=None):
     ]
     ws.append(sub_header)
     bold_font = Font(bold=True)
-    for cell in ws[4]:
+    for cell in ws[3]:
         cell.font = bold_font
     # Define border style
     thin_border = Border(
@@ -87,7 +87,7 @@ def make_xlsx_css(sheet_name="CONSOLIDATED SALARY STATEMENT", wb=None):
     for row in data:
         row_data = [
             s_no,
-            row.get("department", "-"),
+            row.get("custom_section", "-"),
             row.get("bank_amount", 0),
             row.get("cheque_amount", 0),
             row.get("cash_amount", 0),
@@ -119,7 +119,7 @@ def make_xlsx_css(sheet_name="CONSOLIDATED SALARY STATEMENT", wb=None):
             cell.border = thin_border
             cell.alignment = Alignment(horizontal='center', vertical='center')
     font_size=14
-    for row in ws.iter_rows(min_row=1, max_row=1, min_col=1, max_col=19):
+    for row in ws.iter_rows(min_row=1, max_row=1, min_col=1, max_col=6):
         for cell in row:
             cell.border = thin_border
             cell.alignment = Alignment(horizontal='center', vertical='center')
@@ -146,82 +146,94 @@ def get_data_for_css(args):
         institute_condition = "AND e.custom_institute_name = %s"
         params = (from_date, to_date, institute)
     elif not institute and dept:
-        institute_condition = "AND e.department = %s"
+        institute_condition = "AND e.custom_section = %s"
         params = (from_date, to_date, dept)
     elif institute and dept:
-        institute_condition = "AND e.custom_institute_name = %s AND e.department = %s"
+        institute_condition = "AND e.custom_institute_name = %s AND e.custom_section = %s"
         params = (from_date, to_date, institute, dept)
     else:
         institute_condition = ""
         params = (from_date, to_date)
     bank = frappe.db.sql("""
         SELECT 
-            e.department AS department, 
-            SUM(s.net_pay) AS bank_amount
+            e.custom_section AS custom_section, 
+            SUM(FLOOR(s.net_pay + 0.5)) AS bank_amount
         FROM 
             `tabSalary Slip` s
         LEFT JOIN 
             `tabEmployee` e ON s.employee = e.name
         WHERE 
             s.start_date BETWEEN %s AND %s
+            AND s.docstatus != 2
             AND e.salary_mode='Bank'
+            AND e.custom_section IS NOT NULL
+            AND e.custom_section != ''
             {institute_condition}
         GROUP BY 
-            e.department
+            e.custom_section
     """.format(institute_condition=institute_condition), 
     params, as_dict=True)
     cheque = frappe.db.sql("""
         SELECT 
-            e.department AS department, 
-            SUM(s.net_pay) AS cheque_amount
+            e.custom_section AS custom_section, 
+            SUM(FLOOR(s.net_pay + 0.5)) AS cheque_amount
         FROM 
             `tabSalary Slip` s
         LEFT JOIN 
             `tabEmployee` e ON s.employee = e.name
         WHERE 
             s.start_date BETWEEN %s AND %s
+            AND s.docstatus != 2
             AND e.salary_mode='Cheque'
+                           AND e.custom_section IS NOT NULL
+            AND e.custom_section != ''
             {institute_condition}
         GROUP BY 
-            e.department
+            e.custom_section
     """.format(institute_condition=institute_condition), 
     params, as_dict=True)
     cash = frappe.db.sql("""
         SELECT 
-            e.department AS department, 
-            SUM(s.net_pay) AS cash_amount
+            e.custom_section AS custom_section, 
+            SUM(FLOOR(s.net_pay + 0.5)) AS cash_amount
         FROM 
             `tabSalary Slip` s
         LEFT JOIN 
             `tabEmployee` e ON s.employee = e.name
         WHERE 
             s.start_date BETWEEN %s AND %s
+            AND s.docstatus != 2
             AND e.salary_mode='Cash'
+                         AND e.custom_section IS NOT NULL
+            AND e.custom_section != ''
             {institute_condition}
         GROUP BY 
-            e.department
+            e.custom_section
     """.format(institute_condition=institute_condition), 
     params, as_dict=True)
     total = frappe.db.sql("""
         SELECT 
-            e.department AS department, 
-            SUM(s.net_pay) AS total_amount
+            e.custom_section AS custom_section, 
+            SUM(FLOOR(s.net_pay + 0.5)) AS total_amount
         FROM 
             `tabSalary Slip` s
         LEFT JOIN 
             `tabEmployee` e ON s.employee = e.name
         WHERE 
             s.start_date BETWEEN %s AND %s
+            AND s.docstatus != 2
             AND e.salary_mode IN ('Cash','Cheque','Bank')
+                          AND e.custom_section IS NOT NULL
+            AND e.custom_section != ''
             {institute_condition}
         GROUP BY 
-            e.department
+            e.custom_section
     """.format(institute_condition=institute_condition), 
     params, as_dict=True)
     for item in bank:
-        department = item['department']
-        data[department] = {
-            "department": department,
+        custom_section = item['custom_section']
+        data[custom_section] = {
+            "custom_section": custom_section,
             "bank_amount": item['bank_amount'],
             "cheque_amount": 0,
             "cash_amount": 0,
@@ -229,43 +241,43 @@ def get_data_for_css(args):
         }
 
     for item in cheque:
-        department = item['department']
-        if department not in data:
-            data[department] = {
-                "department": department,
+        custom_section = item['custom_section']
+        if custom_section not in data:
+            data[custom_section] = {
+                "custom_section": custom_section,
                 "bank_amount": 0,
                 "cheque_amount": item['cheque_amount'],
                 "cash_amount": 0,
                 "total_amount": 0,
             }
         else:
-            data[department]['cheque_amount'] = item['cheque_amount']
+            data[custom_section]['cheque_amount'] = item['cheque_amount']
 
     for item in cash:
-        department = item['department']
-        if department not in data:
-            data[department] = {
-                "department": department,
+        custom_section = item['custom_section']
+        if custom_section not in data:
+            data[custom_section] = {
+                "custom_section": custom_section,
                 "bank_amount": 0,
                 "cheque_amount": 0,
                 "cash_amount": item['cash_amount'],
                 "total_amount": 0,
             }
         else:
-            data[department]['cash_amount'] = item['cash_amount']
+            data[custom_section]['cash_amount'] = item['cash_amount']
 
     for item in total:
-        department = item['department']
-        if department not in data:
-            data[department] = {
-                "department": department,
+        custom_section = item['custom_section']
+        if custom_section not in data:
+            data[custom_section] = {
+                "custom_section": custom_section,
                 "bank_amount": 0,
                 "cheque_amount": 0,
                 "cash_amount": 0,
                 "total_amount": item['total_amount'],
             }
         else:
-            data[department]['total_amount'] = item['total_amount']
+            data[custom_section]['total_amount'] = item['total_amount']
     return list(data.values())
 
 
@@ -276,7 +288,7 @@ def print_consolidated_salary(doc):
     from_date = doc.from_date
     to_date = doc.to_date
     institute = doc.institute_name
-    dept = doc.department
+    dept = doc.custom_section
 
     if not from_date or not to_date:
         frappe.throw("Both 'From date' and 'To date' are required.")
@@ -293,8 +305,9 @@ def print_consolidated_salary(doc):
     grand_total = 0
 
     data = '<table style="border-collapse: collapse; width: 100%; border: 1px solid black;">'
+    data += f'<tr><td colspan="12" style="text-align:center; font-weight:bold; border: 1px solid black;font-size:14px;">EVEHANS ACADEMY - BANGALORE</td></tr>'
+    
     data += f'<tr><td colspan="12" style="text-align:center; font-weight:bold; border: 1px solid black;font-size:14px;">CONSOLIDATED SALARY STATEMENT FOR THE MONTH - {formated}</td></tr>'
-    data += f'<tr><td colspan="12" style="text-align:center; font-weight:bold; border: 1px solid black;font-size:14px;">BANGALORE</td></tr>'
     data += '<tr>' \
             '<td style="text-align:center; font-weight:bold; border: 1px solid black;">S.NO</td>' \
             '<td style="text-align:center; font-weight:bold; border: 1px solid black;">Section</td>' \
@@ -318,7 +331,7 @@ def print_consolidated_salary(doc):
 
         data += f'<tr>' \
                 f'<td style="text-align:center; border: 1px solid black;">{s_no}</td>' \
-                f'<td style="text-align:center; border: 1px solid black;">{record["department"]}</td>' \
+                f'<td style="text-align:center; border: 1px solid black;">{record["custom_section"]}</td>' \
                 f'<td style="text-align:center; border: 1px solid black;">{bank_amount}</td>' \
                 f'<td style="text-align:center; border: 1px solid black;">{cheque_amount}</td>' \
                 f'<td style="text-align:center; border: 1px solid black;">{cash_amount}</td>' \

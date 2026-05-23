@@ -14,13 +14,15 @@ def execute(filters=None):
 def get_columns():
     return [
         _("Institution") + ":Link/Institute:150",
+        # _("Academic Term") + ":Link/Academic Term:150",
+        _("Semester") + ":Data:150",
         _("Student Name") + ":Link/Student:150",
         _("Program") + ":Link/Program:150",
         _("Student Category") + ":Link/Student Category:80",
         _("Start Date") + ":Start Date:120",
         _("End Date") + ":End Date:120",
         _("Registration Number") + ":Data:120",
-        _("Payment Date") + ":Date:120",
+        _("Payment Date") + ":Data:120",
         _("Registration Fee") + ":Float:120",
         _("Payable Amount") + ":Float:120",
         _("Concession Amount") + ":Float:120",
@@ -57,17 +59,28 @@ def get_data(filters):
             end_date_str = datetime.strptime(end_date_str, "%Y-%m-%d") 
             formatted_end_date = end_date_str.strftime("%d-%m-%Y")
         else:
-            formatted_end_date = ""  
-
+            formatted_end_date = "" 
+        pay_date=row.get("payment_date") 
+        if pay_date:
+            pay_date_str = pay_date.strftime('%Y-%m-%d')
+            pay_date_str = datetime.strptime(pay_date_str, "%Y-%m-%d") 
+            formatted_pay_date = pay_date_str.strftime("%d-%m-%Y")
+        else:
+            formatted_pay_date=''
+        sem=frappe.db.get_value('Academic Term',{'name':row.get("academic_term")},['custom_semester'])
+        if not sem:
+            sem=0
         data.append({
             "institution": row.get("institution_name"),
+            # "institution": row.get("academic_term"),
+            'semester':sem,
             "student_name": row.get("student_name"),
             "program": row.get("program"),
             "student_category": row.get("student_category"),
             "start_date": formatted_start_date,
             "end_date": formatted_end_date,
             "registration_number": row.get("registration_number"),
-            "payment_date": row.get("payment_date"),
+            "payment_date": formatted_pay_date,
             "registration_fee": row.get("course_registration_fee"),
             "payable_amount": row.get("paid__payable_amount"),
             "concession_amount": row.get("concession_amount"),
@@ -126,7 +139,7 @@ def add_filters(filters):
 def get_registration_data(condition):
     sql = """
         SELECT 
-        institution_name, student_name, program, course_name, student_category, payment_date,
+        institution_name, student_name, program, course_name, student_category, payment_date,academic_term,
         start_date, end_date, registration_number, course_registration_fee, 
         paid__payable_amount, concession_amount, amount_paid, outstanding_amount, excess_amount, payment_mode
     FROM `tabRegistration`

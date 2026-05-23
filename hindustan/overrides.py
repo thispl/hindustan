@@ -24,13 +24,100 @@ from frappe.utils import cint, cstr, flt, money_in_words
 from frappe.utils.background_jobs import enqueue
 from frappe.model.mapper import get_mapped_doc
 from education.education.doctype.fee_schedule.fee_schedule import FeeSchedule
+from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
 from frappe.utils import add_days, cint, cstr, flt, getdate, rounded, date_diff, money_in_words, formatdate, get_first_day,today
+import math
+class CustomSalarySlip(SalarySlip):
+    def get_date_details(self):
+        # for i in self.earnings:
+        #     if i.salary_component=='Basic':
+        #         self.custom_earned_basic=i.amount
+        vf = frappe.db.get_value(
+            "Visiting Faculty",
+            {
+                "employee": self.employee,
+                "from_date": self.start_date,
+                "to_date": self.end_date,
+                "docstatus": 1           
+            },
+            ["hours"],
+            as_dict=True
+        )
+
+        if vf:
+            self.custom_total_hours = vf.hours   
+            if self.custom_total_hours:
+                emp_basic = frappe.db.get_value(
+                    "Employee",
+                    self.employee,
+                    "custom_basic"
+                ) or 0
+                self.custom_basic = float(emp_basic) * float(self.custom_total_hours)
+                self.custom_total = self.custom_basic
+
+        self.calculate_lop()
+    
+
+    def calculate_lop(self):
+        if not self.total_working_days:
+            self.custom_lop_amount = 0
+            return
+        if self.custom_visiting_facility:
+            self.custom_lop_amount = 0
+            return
+
+        custom_total = self.custom_total or 0
+        payment_days = self.payment_days or 0
+        absent_days = self.absent_days or 0
+        leave_without_pay = self.leave_without_pay or 0
+        total_working_days = self.total_working_days or 1
+
+        fixed = (custom_total / total_working_days) * (payment_days + absent_days+ leave_without_pay)
+        # frappe.errprint(fixed)
+        components = [
+            "Basic",
+            "Dearness Allowance",
+            "House Rent Allowance",
+            "Medical Allowance",
+            "Conveyance",
+            "Allowance"
+        ]
+
+        earned_value = 0
+
+        for d in self.earnings:
+            if d.salary_component in components:
+                earned_value += d.amount
+
+        fixed_round = round(fixed)
+        earned_round = round(earned_value)
+        # frappe.errprint(fixed_round)
+        # frappe.errprint(earned_round)
+        # lop = fixed - earned_value
+        lop = fixed_round - earned_round
+        # frappe.errprint(lop)
+        if lop < 0:
+            lop = abs(lop)
+        # frappe.errprint(lop)
+        self.custom_lop_amount = round(lop)
+    
 
 
+    def before_save(self):
+        if self.gross_pay:
+            decimal_part = self.gross_pay - int(self.gross_pay)
+            if decimal_part >= 0.5:
+                self.gross_pay = math.ceil(self.gross_pay)
+            else:
+                self.gross_pay = math.floor(self.gross_pay)
+
+    def validate(self):
+        self.calculate_lop()
+        
 class CustomFeeSchedule(FeeSchedule):
     @frappe.whitelist()
     def create_fees(self):
-        frappe.log_error(title="error in fee")
+        # frappe.log_error(title="error in fee")
         self.db_set("fee_creation_status", "In Process")
         frappe.publish_realtime(
             "fee_schedule_progress", {"progress": "0", "reload": 1}, user=frappe.session.user
@@ -197,8 +284,8 @@ def get_students(student_group, academic_year, academic_term=None, student_categ
     """
 
     # Debug logs for validation
-    frappe.log_error(message=query, title="Debug: Final SQL Query")
-    frappe.log_error(message=str(args), title="Debug: SQL Query Arguments")
+    # frappe.log_error(message=conditions_clause, title="Debug: Final SQL Query")
+    # frappe.log_error(message=str(args), title="Debug: SQL Query Arguments")
 
     # Execute query
     students = frappe.db.sql(query, args, as_dict=1)

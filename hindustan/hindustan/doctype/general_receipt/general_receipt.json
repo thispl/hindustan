@@ -8,7 +8,11 @@
  "field_order": [
   "posting_date",
   "receive_type",
+  "is_student",
   "recieved_person",
+  "student",
+  "person",
+  "admission",
   "received_date",
   "column_break_x85t",
   "reciept_number",
@@ -27,7 +31,8 @@
   "reference_number",
   "section_break_lpnd",
   "remarks",
-  "amended_from"
+  "amended_from",
+  "cancellation_remarks"
  ],
  "fields": [
   {
@@ -46,9 +51,10 @@
    "reqd": 1
   },
   {
+   "depends_on": "eval:doc.__islocal",
    "fieldname": "recieved_person",
    "fieldtype": "Link",
-   "label": "Name",
+   "label": "Person",
    "options": "Receiving Person",
    "reqd": 1
   },
@@ -56,7 +62,7 @@
    "fieldname": "received_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Date",
+   "label": "Payment Date",
    "reqd": 1
   },
   {
@@ -66,7 +72,7 @@
   {
    "fieldname": "reciept_number",
    "fieldtype": "Data",
-   "label": "Reciept Number",
+   "label": "Receipt Number",
    "reqd": 1
   },
   {
@@ -84,6 +90,7 @@
    "options": "Letter Head"
   },
   {
+   "fetch_from": "student.custom_program",
    "fieldname": "program",
    "fieldtype": "Link",
    "label": "Program",
@@ -169,12 +176,51 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.docstatus!=0",
+   "fieldname": "cancellation_remarks",
+   "fieldtype": "Small Text",
+   "label": "Cancellation Remarks",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "recieved_person.student",
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "label": "Student",
+   "options": "Student",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_student",
+   "fieldtype": "Check",
+   "label": "Is student"
+  },
+  {
+   "fetch_from": "student.custom_admission_number",
+   "fetch_if_empty": 1,
+   "fieldname": "admission",
+   "fieldtype": "Data",
+   "label": "Admission",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fetch_from": "recieved_person.person_name",
+   "fetch_if_empty": 1,
+   "fieldname": "person",
+   "fieldtype": "Data",
+   "label": "Name",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-13 12:24:14.483954",
+ "modified": "2026-05-15 15:56:29.023911",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "General Receipt",

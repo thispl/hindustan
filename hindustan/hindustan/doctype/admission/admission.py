@@ -385,11 +385,47 @@ def test_check():
                 data += "</tr>"
         return data
 
+import re
 @frappe.whitelist()
-def get_adm_no(ins,name):
-    count=frappe.db.count("Admission",{'institution_name':ins,'name':['!=',name],'docstatus':['!=',2]})
-    count+=1
-    s_code=frappe.db.get_value('Institute',{'name':ins},['institute_short_code'])
-    receipt_number = f'A-{s_code}-{str(count).zfill(5)}'
-    return receipt_number
+def get_adm_no(ins, name):
+    reg_list = frappe.db.get_all("Admission", {'institution_name': ins, 'name': ['!=', name], 'docstatus': ['!=', 2]}, ['admission_number'])
+    max_num = 0
+    pattern = re.compile(r"^A-(\w+)-(\d+)$")  
+    for reg in reg_list:
+        registration_number = reg['admission_number']
+        match = pattern.match(registration_number)
+        if match:
+            num_part = int(match.group(2))
+            if num_part > max_num:
+                max_num = num_part    
+    next_num = max_num + 1
+    s_code = frappe.db.get_value('Institute', {'name': ins}, ['institute_short_code'])
+    if next_num > 9999:
+        next_reg_number = f'A-{s_code}-{str(next_num).zfill(5)}'
+    else:
+        next_reg_number = f'A-{s_code}-{next_num}'
+    
+    return next_reg_number
+@frappe.whitelist()
+def update_student_name(name,updated_name):
+    if frappe.db.exists("Student",{'custom_admission_number':name}):
+        stu=frappe.get_doc("Student",{'custom_admission_number':name})
+        frappe.db.set_value('Student',stu.name,'student_name',updated_name)
+        frappe.db.set_value('Student',stu.name,'first_name',updated_name)
+        group=frappe.db.get_all("Student Group Student",{'parenttype':'Student Group','student':stu.name},['parent'])
+        for g in group:
+            student_group = frappe.get_doc("Student Group", g.parent)
+            for row in student_group.students:
+                if row.student == stu.name:
+                    row.student_name = updated_name
+                    row.flags.modified = True 
+                    break  
+
+            student_group.save(ignore_permissions=True)
+
+        doc_list=['Fees','Program Enrollment','Fees Collection','Additional Fee','Advance Fees']
+        for doc in doc_list:
+            prog=frappe.db.get_all(doc,{'student':stu.name},['name'])
+            for p in prog:
+                frappe.db.set_value(doc,p.name,'student_name',updated_name)
 

@@ -18,6 +18,28 @@ from frappe import ValidationError, _, qb, scrub, throw
 
 
 class FeesCollection(AccountsController):
+	def after_insert(self):
+		rec_list = frappe.db.get_all("Fees Collection", {'receipt_number': ['!=', ''], 'docstatus': ['!=', 2],'name':['!=',self.name]}, ['receipt_number'])
+		pattern = re.compile(r"^TF\d{6}$")
+		max_num = 0
+		if rec_list:
+			for rec in rec_list:
+				receipt_number = rec['receipt_number']
+				if pattern.match(receipt_number):
+					num_part_str = receipt_number[2:]  
+					try:
+						num_part = int(num_part_str)
+						if num_part > max_num:
+							max_num = num_part
+					except ValueError:
+						continue
+			new_receipt_number = f"TF{str(max_num + 1).zfill(6)}"
+		else:
+			new_receipt_number = 'TF000001'
+		# frappe.errprint(new_receipt_number)
+		# self.receipt_number=new_receipt_number
+		frappe.db.set_value("Fees Collection",self.name,'receipt_number',new_receipt_number)
+		self.reload()
 	def set_indicator(self):
 		"""Set indicator for portal"""
 		if self.outstanding_amount > 0:
@@ -26,7 +48,6 @@ class FeesCollection(AccountsController):
 		else:
 			self.indicator_color = "green"
 			self.indicator_title = _("Paid")
-
 	def validate(self):
 		self.calculate_total()
 		self.set_missing_accounts_and_fields()
@@ -449,7 +470,7 @@ def udpate_advance_payment_on_master(self):
 
 			if existing_child:
 				existing_child.adjusted_amount += child.adjusted_amount
-				existing_child.balance_amount = child.received_amount - existing_child.adjusted_amount
+				existing_child.balance_amount = existing_child.received_amount - existing_child.adjusted_amount
 
 		adv.save()
 
@@ -501,26 +522,26 @@ def update_advance_fees(self):
 				
 @frappe.whitelist()
 def create_concession(self):
-	concession_exist = frappe.db.exists("Concession", 
-										{"student": self.student, "academic_year": self.academic_year, 
-										 "academic_term": self.academic_term, "program": self.program, "docstatus": 1
-		   								})
-	if concession_exist:
-		if self.mark_concession and self.concession_amount > 0 and self.concession_on :
-			frappe.throw("Concession has already been applied for this semester")
-	if not concession_exist:								
-		if self.mark_concession and self.concession_amount > 0 and self.concession_on :
-			concession = frappe.new_doc("Concession")
-			concession.student = self.student
-			concession.academic_year = self.academic_year
-			concession.academic_term = self.academic_term
-			concession.program = self.program
-			concession.concession_amount = self.concession_amount
-			concession.fees = self.fees
-			concession.fees_collection = self.name
-			concession.concession_on = self.concession_on
-			concession.save(ignore_permissions=True)
-			concession.submit()
+	# concession_exist = frappe.db.exists("Concession", 
+	# 									{"student": self.student, "academic_year": self.academic_year, 
+	# 									 "academic_term": self.academic_term, "program": self.program, "docstatus": 1
+	# 	   								})
+	# if concession_exist:
+	# 	if self.mark_concession and self.concession_amount > 0 and self.concession_on :
+	# 		frappe.throw("Concession has already been applied for this semester")
+	# if not concession_exist:								
+	if self.mark_concession and self.concession_amount > 0 and self.concession_on :
+		concession = frappe.new_doc("Concession")
+		concession.student = self.student
+		concession.academic_year = self.academic_year
+		concession.academic_term = self.academic_term
+		concession.program = self.program
+		concession.concession_amount = self.concession_amount
+		concession.fees = self.fees
+		concession.fees_collection = self.name
+		concession.concession_on = self.concession_on
+		concession.save(ignore_permissions=True)
+		concession.submit()
    
 @frappe.whitelist()
 def update_concession_on_paying_amount(self):
@@ -580,7 +601,8 @@ def validate_amount_paid(self):
 	for row in self.components:
 		tot += row.paying_amount
 	if tot == 0:
-		frappe.throw("Could not save document with <b>zero payment</b>")
+		if self.mark_concession==0:
+			frappe.throw("Could not save document with <b>zero payment</b>")
 	
 # to update outstanding_amount in fee master
 @frappe.whitelist()
@@ -628,10 +650,46 @@ def cancel_fees_collection(self):
 						child.adjusted_amount = child.adjusted_amount - row.adjusted_amount
 						child.balance_amount = child.balance_amount + row.adjusted_amount
 						child.adjusted = 0
+						
 		adv.save(ignore_permissions=True)
 		
 	if frappe.db.exists("Concession", {"fees_collection": self.name, "docstatus": 1}):
 		concession = frappe.get_doc("Concession", {"fees_collection": self.name})
 		concession.cancel()
-		
-	   
+	delete_fees_colection_row(self)
+
+@frappe.whitelist()
+def delete_fees_colection_row(self):
+	if frappe.db.exists("Advance Fees",{'registration_number':self.registration_number}):
+		docs= frappe.db.get_all("Advance Fees",{'registration_number':self.registration_number},['name'])
+		for doc in docs:
+			adv=frappe.get_doc('Advance Fees',doc.name)
+			for i in adv.advance_payment:
+				if i.reference_type=='Fees Collection' and i.reference_number==self.name and i.adjusted_amount==0:
+					adv.remove(i)
+					adv.save(ignore_permissions=True)
+					frappe.db.commit()
+
+
+import re
+@frappe.whitelist()
+def get_rec_no():
+    rec_list = frappe.db.get_all("Fees Collection", {'receipt_number': ['!=', ''], 'docstatus': ['!=', 2]}, ['receipt_number'])
+    pattern = re.compile(r"^TF\d{6}$")
+    max_num = 0
+    if rec_list:
+        for rec in rec_list:
+            receipt_number = rec['receipt_number']
+            if pattern.match(receipt_number):
+                num_part_str = receipt_number[2:]  
+                try:
+                    num_part = int(num_part_str)
+                    if num_part > max_num:
+                        max_num = num_part
+                except ValueError:
+                    continue
+        new_receipt_number = f"TF{str(max_num + 1).zfill(6)}"
+    else:
+        new_receipt_number = 'TF000001'
+    
+    return new_receipt_number

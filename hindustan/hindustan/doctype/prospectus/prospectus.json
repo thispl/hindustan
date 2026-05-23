@@ -146,6 +146,7 @@
    "fieldtype": "Data",
    "label": "Email",
    "no_copy": 1,
+   "options": "Email",
    "unique": 1
   },
   {
@@ -366,7 +367,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-03 17:36:40.004262",
+ "modified": "2025-05-10 12:01:16.655296",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "Prospectus",

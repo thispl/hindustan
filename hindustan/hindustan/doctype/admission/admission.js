@@ -2,6 +2,44 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Admission", {
+    refresh(frm) {
+        // if ()
+        if (frm.doc.docstatus === 1) {
+            frm.add_custom_button('Update Student Name', () => {
+                let d = new frappe.ui.Dialog({
+                    title: 'Update Student Name',
+                    fields: [
+                        {
+                            label: 'Student Name',
+                            fieldname: 'updated_name',
+                            fieldtype: 'Data',
+                            reqd: true
+                        }
+                    ],
+                    primary_action_label: 'Submit',
+                    primary_action(values) {
+                        frm.set_value('student_name', values.updated_name);
+
+                        frm.save()
+                            .then(() => {
+                                
+                                frappe.call({
+                                    method: "hindustan.hindustan.doctype.admission.admission.update_student_name",
+                                    args: {
+                                        name: frm.doc.name,
+                                        updated_name: values.updated_name
+                                    },
+                                    
+                                });
+                                d.hide();
+                            });
+                    }
+                });
+
+                d.show();
+            });
+        }
+    },
     before_submit: function(frm) {
         if (!frm.doc.aadhar_number){
         return new Promise((resolve, reject) => {

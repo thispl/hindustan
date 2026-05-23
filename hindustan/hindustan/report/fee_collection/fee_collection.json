@@ -1,0 +1,34 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2025-04-02 12:49:42.526474",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Evehans Academy",
+ "letterhead": null,
+ "modified": "2025-04-02 14:26:49.632706",
+ "modified_by": "Administrator",
+ "module": "Hindustan",
+ "name": "Fee Collection",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Fees Collection",
+ "report_name": "Fee Collection",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Academics User"
+  }
+ ],
+ "timeout": 0
+}

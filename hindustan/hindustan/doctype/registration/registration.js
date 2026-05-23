@@ -2,6 +2,24 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Registration", {
+    // after_insert: function(frm){
+    //     console.log('message')
+	// 	frappe.call({
+    //         method: "hindustan.hindustan.doctype.registration.registration.get_rec_no",
+    //         callback(r){
+    //             if (r.message){
+    //                 console.log('message')
+    //                 console.log(r.message)
+    //                 frm.set_value("receipt_number",r.message)
+    //             }
+    //             else{
+    //                 frm.set_value("receipt_number",'')
+    //             }
+    //         }
+    //     })
+	// 	frm.save()
+	// 	frm.reload_doc()
+	// },
     institution_name(frm) {
         if (!frm.doc.is__islocal){
             if (frm.doc.institution_name){

@@ -8,13 +8,15 @@
  "field_order": [
   "naming_series",
   "student",
-  "registration_number",
-  "admission_number",
   "student_name",
+  "admission_number",
+  "admission",
+  "registration_number",
   "include_payment",
   "send_payment_request",
   "column_break_smlc",
   "company",
+  "receipt_number",
   "posting_date",
   "posting_time",
   "due_date",
@@ -66,7 +68,6 @@
   "grand_total",
   "grand_total_in_words",
   "amount_paid",
-  "amended_from",
   "column_break_uqmd",
   "outstanding_amount",
   "paying_amount",
@@ -91,7 +92,8 @@
   "print_heading",
   "cancellation_remarks_tab",
   "section_break_nb4g",
-  "cancellation_remarks"
+  "cancellation_remarks",
+  "amended_from"
  ],
  "fields": [
   {
@@ -445,6 +447,7 @@
    "label": "Get Advance"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "advance_payment",
    "fieldtype": "Table",
    "label": "Advance Payment",
@@ -458,8 +461,7 @@
    "in_global_search": 1,
    "in_list_view": 1,
    "label": "Registration Number",
-   "options": "Registration",
-   "reqd": 1
+   "options": "Registration"
   },
   {
    "fieldname": "advances_section",
@@ -551,7 +553,7 @@
    "fieldname": "account_number",
    "fieldtype": "Data",
    "label": "Account Number",
-   "mandatory_depends_on": "eval:doc.payment_mode=='DD'",
+   "mandatory_depends_on": "// eval:doc.payment_mode=='DD'",
    "read_only": 1
   },
   {
@@ -648,11 +650,12 @@
    "label": "Remarks"
   },
   {
+   "depends_on": "eval:!doc.student",
    "fetch_from": "student.custom_admission_number",
    "fetch_if_empty": 1,
    "fieldname": "admission_number",
    "fieldtype": "Link",
-   "label": "Admission Number",
+   "label": "Admission ID",
    "options": "Admission"
   },
   {
@@ -661,6 +664,20 @@
    "fieldtype": "Check",
    "label": "Automatic Creation",
    "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.student",
+   "fetch_from": "admission_number.admission_number",
+   "fetch_if_empty": 1,
+   "fieldname": "admission",
+   "fieldtype": "Data",
+   "label": "Admission Number"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "receipt_number",
+   "fieldtype": "Data",
+   "label": "Receipt Number"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -671,7 +688,7 @@
    "link_fieldname": "fees_collection"
   }
  ],
- "modified": "2025-03-15 11:51:03.545732",
+ "modified": "2025-07-08 10:37:34.203505",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "Fees Collection",

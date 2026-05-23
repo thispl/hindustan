@@ -24,6 +24,23 @@ class Registration(Document):
             else:
                 new_receipt_number='R000001'
             self.receipt_number=new_receipt_number
+        else:
+            if frappe.db.exists("Registration",{'receipt_number':self.receipt_number,'name':['!=',self.name],'docstatus':['!=',2]}):
+                rec_list=frappe.db.get_all("Registration",{'receipt_number':['!=',''],'name':['!=',self.name],'docstatus':['!=',2]},['receipt_number'])
+                pattern = re.compile(r"^R\d{6}$")
+                max_num = 0
+                if rec_list:
+                    for rec in rec_list:
+                        receipt_number = rec['receipt_number']
+                        if pattern.match(receipt_number):
+                            num_part = int(receipt_number[1:]) 
+                            if num_part > max_num:
+                                max_num = num_part
+                    new_receipt_number = f"R{str(max_num + 1).zfill(6)}"
+                else:
+                    new_receipt_number='R000001'
+                self.receipt_number=new_receipt_number
+                self.db_set("receipt_number", self.receipt_number)
         if not self.registration_number:
             count=frappe.db.count("Registration",{'institution_name':self.institution_name,'name':['!=',self.name],'docstatus':['!=',2]})
             count+=1
@@ -117,7 +134,8 @@ class Registration(Document):
 
         else:
             if self.spot_admission == 0:
-                frappe.throw("Kindly Pay the Registration Fee")
+                if self.concession_amount!=self.course_registration_fee:
+                    frappe.throw("Kindly Pay the Registration Fee")
 
     def on_update_after_submit(self):
         amount_paid = self.amount_paid
@@ -189,13 +207,28 @@ def get_reg_amount(sem,category,year,program):
            if f.fees_category == 'Registration Fee':
                return f.amount
            
+import re
 @frappe.whitelist()
-def get_reg_no(ins,name):
-    count=frappe.db.count("Registration",{'institution_name':ins,'name':['!=',name],'docstatus':['!=',2]})
-    count+=1
-    s_code=frappe.db.get_value('Institute',{'name':ins},['institute_short_code'])
-    receipt_number = f'R-{s_code}-{str(count).zfill(5)}'
-    return receipt_number
+def get_reg_no(ins, name):
+    reg_list = frappe.db.get_all("Registration", {'institution_name': ins, 'name': ['!=', name], 'docstatus': ['!=', 2]}, ['name'])
+    max_num = 0
+    pattern = re.compile(r"^R-(\w+)-(\d+)$")  
+    for reg in reg_list:
+        registration_number = reg['name']
+        match = pattern.match(registration_number)
+        if match:
+            num_part = int(match.group(2))
+            if num_part > max_num:
+                max_num = num_part    
+    next_num = max_num + 1
+    s_code = frappe.db.get_value('Institute', {'name': ins}, ['institute_short_code'])
+    if next_num > 9999:
+        next_reg_number = f'R-{s_code}-{str(next_num).zfill(5)}'
+    else:
+        next_reg_number = f'R-{s_code}-{next_num}'
+    
+    return next_reg_number
+
 import re
 @frappe.whitelist()
 def get_rec_no():

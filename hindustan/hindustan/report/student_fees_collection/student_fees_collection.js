@@ -9,10 +9,23 @@ frappe.query_reports["Student Fees Collection"] = {
 			"fieldtype": "Link",
 			"options": "Student",
 		},
+		// {
+		// 	"label": __("Student Name"),
+		// 	"fieldname": "student_name",
+		// 	"fieldtype": "Data",
+		// },
 		{
-			"label": __("Student Name"),
-			"fieldname": "student_name",
-			"fieldtype": "Data",
+			"label": __("Admission"),
+			"fieldname": "admission",
+			"fieldtype": "Link",
+			"options": "Admission",
+			"get_query": function() {
+				return {
+					filters: {
+						"docstatus": 1 // Only show submitted Admission documents
+					}
+				};
+			}
 		},
 		{
 			"label": __("Institute"),
