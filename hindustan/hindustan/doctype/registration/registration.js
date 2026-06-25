@@ -2,6 +2,39 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Registration", {
+    refresh(frm) {
+        if (frm.doc.docstatus === 1) {
+            frm.add_custom_button('Update Student Name', () => {
+                let d = new frappe.ui.Dialog({
+                    title: 'Update Student Name',
+                    fields: [{
+                        label: 'New Student Name',
+                        fieldname: 'updated_name',
+                        fieldtype: 'Data',
+                        reqd: true
+                    }],
+                    primary_action_label: 'Update',
+                    primary_action(values) {
+                        frappe.call({
+                            method: "hindustan.hindustan.doctype.registration.registration.update_student_name_from_registration",
+                            args: {
+                                name: frm.doc.name,
+                                updated_name: values.updated_name
+                            },
+                            callback: function(r) {
+                                if (r.message === "Success") {
+                                    frappe.msgprint('Student Name Updated Successfully!');
+                                    frm.reload_doc();
+                                }
+                            }
+                        });
+                        d.hide();
+                    }
+                });
+                d.show();
+            });
+        }
+    },
     // after_insert: function(frm){
     //     console.log('message')
 	// 	frappe.call({

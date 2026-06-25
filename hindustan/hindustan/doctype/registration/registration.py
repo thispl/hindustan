@@ -246,3 +246,40 @@ def get_rec_no():
     else:
         new_receipt_number='R000001'
     return new_receipt_number
+
+
+@frappe.whitelist()
+def update_student_name_from_registration(name, updated_name):
+    
+    if not frappe.db.exists("Admission", {'registration_number': name}):
+        frappe.throw("Admission not found for this Registration!")
+    
+    admission = frappe.get_doc("Admission", {'registration_number': name})
+    if not frappe.db.exists("Student", {'custom_admission_number': admission.name}):
+        frappe.throw("Student not found!")
+
+    stu = frappe.get_doc("Student", {'custom_admission_number': admission.name})
+    frappe.db.set_value('Student', stu.name, 'student_name', updated_name)
+    frappe.db.set_value('Student', stu.name, 'first_name', updated_name)
+    frappe.db.set_value('Admission', admission.name, 'student_name', updated_name)
+
+    frappe.db.set_value('Registration', name, 'student_name', updated_name)
+    group = frappe.db.get_all("Student Group Student",
+                {'parenttype': 'Student Group', 'student': stu.name}, ['parent'])
+    for g in group:
+        student_group = frappe.get_doc("Student Group", g.parent)
+        for row in student_group.students:
+            if row.student == stu.name:
+                row.student_name = updated_name
+                break
+        student_group.save(ignore_permissions=True)
+
+    doc_list = ['Fees', 'Program Enrollment', 'Fees Collection',
+                'Additional Fee', 'Advance Fees']
+    for doc in doc_list:
+        prog = frappe.db.get_all(doc, {'student': stu.name}, ['name'])
+        for p in prog:
+            frappe.db.set_value(doc, p.name, 'student_name', updated_name)
+
+    frappe.db.commit()
+    return "Success"
