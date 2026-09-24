@@ -56,3 +56,47 @@ def cancellation_remarks_mandatory(doc, method):
     
     if not doc.cancellation_remarks:
         frappe.throw("Please provide a reason for cancellation.")
+
+
+
+
+
+@frappe.whitelist()
+def update_student_phone(admission, student, phone_number):
+
+    frappe.db.set_value(
+        "Admission",
+        admission,
+        "phone_number",
+        phone_number
+    )
+
+    frappe.db.set_value(
+        "Student",
+        student,
+        "custom_mobile_number_",
+        phone_number
+    )
+
+    # frappe.db.commit()
+
+@frappe.whitelist()
+def update_student_email(admission, student, email):
+
+    frappe.db.set_value(
+        "Admission",
+        admission,
+        "email_id",
+        email
+    )
+
+    frappe.db.set_value(
+        "Student",
+        student,
+        "student_email_id",
+        email
+    )
+
+    frappe.db.commit()
+
+    

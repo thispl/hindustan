@@ -1611,11 +1611,12 @@ def update_names():
 
 @frappe.whitelist()
 def update_outstanding_amount():
-    fdoc=frappe.get_doc('Fees','EVE-FEE-2025-01266')
+    fdoc=frappe.get_doc('Fees','EVE-FEE-2026-00409')
     out=0
     for d in fdoc.components:
         out+=d.custom_outstanding_amount
         print(out)
+    print(fdoc.outstanding_amount)
 
 
 
@@ -1722,3 +1723,91 @@ def update_outstanding_amount():
 
 #         doc.custom_remarks = "Program Changed"
 
+
+
+
+@frappe.whitelist()
+def update_student_phone(admission, student, phone_number):
+
+    frappe.db.set_value(
+        "Admission",
+        admission,
+        "phone_number",
+        phone_number
+    )
+
+    frappe.db.set_value(
+        "Student",
+        student,
+        "custom_mobile_number_",
+        phone_number
+    )
+
+    frappe.db.commit()
+
+@frappe.whitelist()
+def update_student_email(admission, student, email):
+
+    frappe.db.set_value(
+        "Admission",
+        admission,
+        "email_id",
+        email
+    )
+
+    frappe.db.set_value(
+        "Student",
+        student,
+        "student_email_id",
+        email
+    )
+
+    frappe.db.commit()
+
+@frappe.whitelist()
+def ot_update():
+
+    frappe.db.set_value(
+        "Fees",
+        # "EVE-FEE-2026-00326",
+        # 'EVE-FEE-2026-00329',
+        # 'EVE-FEE-2026-00372',
+        # 'EVE-FEE-2026-00575',
+        # 'EVE-FEE-2026-00616',
+        # 'EVE-FEE-2026-00439',
+        # 'EVE-FEE-2026-00618',
+        # 'EVE-FEE-2026-00620',
+        # 'EVE-FEE-2026-00623',
+        # 'EVE-FEE-2026-01478',
+        # 'EVE-FEE-2026-00153',
+        'EVE-FEE-2026-01556',
+        "outstanding_amount",
+        # 100000,
+        # 500,
+        # 166500,
+        # 91500,
+        # 0,
+        # 0,
+        # 0,
+        # 0,
+        # 0,
+        # 0,
+        0,
+        update_modified=False
+    )
+    
+
+    frappe.db.commit()
+
+    print("Outstanding amount updated successfully.")
+
+@frappe.whitelist()
+def ca_check():
+    fees = frappe.get_doc("Fees", "EVE-FEE-2026-00650")
+    print("grand_total in DB:", fees.grand_total)
+    print("outstanding_amount in DB:", fees.outstanding_amount)
+
+    # force recalc and see what it *should* be
+    fees.calculate_total()
+    print("recalculated grand_total:", fees.grand_total)
+    print("recalculated outstanding_amount:", fees.outstanding_amount)

@@ -108,16 +108,25 @@ def update_student_docs(program,academic_year):
     for docs in student_docs:
         doc=frappe.get_doc('Student',docs.name)
         frappe.errprint(doc.name)
-        sem=frappe.db.get_all("Academic Term",{'academic_year':academic_year,'program':doc.custom_program},['name'])
+        
+        total_semesters = cint(frappe.db.get_value("Program",doc.custom_program,"custom_no_of_semesters"))
+        start_year, end_year = map(int, academic_year.split("-"))
+        sem = []
+        for sem_no in range(1, total_semesters + 1):
+            year_offset = (sem_no - 1) // 2
+            term_academic_year = (f"{start_year + year_offset}-{end_year + year_offset}")
+            terms = frappe.get_all("Academic Term",filters={"program": doc.custom_program,"academic_year": term_academic_year,"custom_semester": sem_no},fields=["name", "academic_year", "custom_semester"])
+            sem.extend(terms)
+
         for s in sem:
-            if not frappe.db.exists("Program Enrollment",{'student':doc.name,'academic_year':doc.custom_academic_year,'academic_term':doc.custom_current_academic_term,'program':doc.custom_program,'docstatus':1}):
-                edate=frappe.db.get_value("Academic Term",{'name':doc.custom_current_academic_term},['term_start_date'])
+            if not frappe.db.exists("Program Enrollment",{'student':doc.name,'academic_year':s.academic_year,'academic_term':s.name,'program':doc.custom_program,'docstatus':1}):
+                edate=frappe.db.get_value("Academic Term",s.name,['term_start_date'])
                 enroll=frappe.new_doc("Program Enrollment")
                 enroll.student=doc.name
                 enroll.program=doc.custom_program
-                enroll.academic_year=academic_year
+                enroll.academic_year= s.academic_year
                 enroll.enrollment_date=edate
-                enroll.academic_term=doc.custom_current_academic_term
+                enroll.academic_term= s.name
                 enroll.student_category=doc.custom_student_category
                 if not frappe.db.exists("Student Batch Name",{'batch_name':doc.custom_academic_year}):
                     # frappe.errprint("NOT Student Batch")

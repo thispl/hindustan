@@ -182,6 +182,11 @@ def allocate_leaves_automatically_cl():
         filters={'status':"Active"},  
         fields=['name', 'employee', 'date_of_joining']
     )
+    # employees = frappe.get_all(
+    #     'Employee',
+    #     filters={'status':"Active",'name':'HR-EMP-00156'},  
+    #     fields=['name', 'employee', 'date_of_joining']
+    # )
     print(employees)
 
     today = datetime.today().date()
@@ -244,12 +249,16 @@ def allocate_leaves_automatically_cl():
             
 
             if allocation and today == july_from:
+                
             # if allocation :
+                print("HI")
                 allocation_doc = frappe.get_doc('Leave Allocation', allocation[0].name)
+                print(allocation_doc)
                 old_total = allocation_doc.total_leaves_allocated or 0
-
+                print(old_total)
 
                 total_cl = old_total + allocated_second_half
+                print(total_cl)
 
                 allocation_doc.total_leaves_allocated = total_cl
                 allocation_doc.new_leaves_allocated = total_cl
@@ -278,7 +287,10 @@ def allocate_leaves_automatically_cl():
             print(current_year)
             jan_from = date(current_year, 1, 1)
             dec_to = date(current_year, 12, 31)
+            print(jan_from)
+            print(dec_to)
             july_from = date(current_year, 7, 1)
+            # july_from = date(current_year, 7, 14)
 
             existing_allocation = frappe.db.exists('Leave Allocation', {
                 'employee': employee.name,
@@ -290,7 +302,8 @@ def allocate_leaves_automatically_cl():
             if not existing_allocation:
                 create_leave_allocation_new(employee.name, 'Casual Leave', current_year, 6, jan_from, dec_to)
                 frappe.logger().info(f"{employee.name}: Jan–Dec {current_year} allocated (6 leaves)")
-
+                print("existing_allocation")
+                print(existing_allocation)
             elif today == july_from:
                 allocation = frappe.get_all('Leave Allocation',
                     filters={
@@ -302,12 +315,18 @@ def allocate_leaves_automatically_cl():
                     },
                     fields=['name', 'total_leaves_allocated']
                 )
+                print("allocation")
+                print(allocation)
 
                 if allocation:
                     allocation_doc = frappe.get_doc('Leave Allocation', allocation[0].name)
+                    print(allocation_doc)
                     allocation_name = allocation[0].name
+                    print(allocation_name)
                     old_total = allocation[0].total_leaves_allocated or 0
+                    print(old_total)
                     new_total = old_total + 6
+                    print(new_total)
                     allocation_doc.new_leaves_allocated = new_total
                     allocation_doc.total_leaves_allocated = new_total
                     allocation_doc.save(ignore_permissions=True)

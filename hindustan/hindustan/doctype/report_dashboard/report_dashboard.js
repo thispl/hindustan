@@ -44,48 +44,55 @@ frappe.ui.form.on("Report Dashboard", {
             window.location.href = url;
         }
     },
-    pdf(frm){
-        if (frm.doc.report == 'Consolidated Salary statement'){
-            var print_format ="Consolidated Salary Statement";
-			var f_name = frm.doc.name
-			window.open(frappe.urllib.get_full_url("/api/method/frappe.utils.print_format.download_pdf?"
-				+ "doctype=" + encodeURIComponent("Report Dashboard")
-				+ "&name=" + encodeURIComponent(f_name)
-				+ "&trigger_print=1"
-				+ "&format=" + print_format
-				+ "&no_letterhead=0"
-			));
-        }
+    pdf(frm) {
+        trigger_pdf_download(frm);
+    },
+    salary_register_pdf(frm) {
+        trigger_pdf_download(frm);
+    },
+    consolidated_statement_pdf(frm) {
+        trigger_pdf_download(frm);
+    }
+});
 
-        // if (frm.doc.report == 'Transfer Statement') {
+function trigger_pdf_download(frm) {
+    if (!frm.doc.from_date || !frm.doc.to_date) {
+        frappe.throw(__("Please select From Date and To Date"));
+        return;
+    }
 
-        //     var path = "hindustan.hindustan.doctype.report_dashboard.report_dashboard.transfer_statement_pdf_download";
-
-        //     var args = "from_date=" + encodeURIComponent(frm.doc.from_date) +
-        //             "&to_date=" + encodeURIComponent(frm.doc.to_date) +
-        //             "&institute_name=" + encodeURIComponent(frm.doc.institute_name) +
-        //             "&dept=" + encodeURIComponent(frm.doc.custom_section);
-
-        //     window.open("/api/method/" + path + "?" + args);
-        // }
-
+    frm.save().then(() => {
         if (frm.doc.report === "Transfer Statement") {
-
             let path = "hindustan.hindustan.doctype.report_dashboard.report_dashboard.transfer_statement_pdf_download";
-
             let args = {
                 from_date: frm.doc.from_date || "",
                 to_date: frm.doc.to_date || "",
                 institute_name: frm.doc.institute_name || "",
                 dept: frm.doc.custom_section || ""
             };
-
             let query = Object.keys(args)
                 .map(key => key + "=" + encodeURIComponent(args[key]))
                 .join("&");
 
             window.open("/api/method/" + path + "?" + query);
+            return;
         }
-            
-     }
-});
+
+        let print_format = "";
+        if (frm.doc.report === "Salary Register") {
+            print_format = "Salary Register";
+        } else if (frm.doc.report === "Consolidated Salary statement" || frm.doc.report === "Consolidated statement") {
+            print_format = "Consolidated Salary Statement";
+        }
+
+        if (print_format) {
+            window.open(frappe.urllib.get_full_url("/api/method/frappe.utils.print_format.download_pdf?"
+                + "doctype=" + encodeURIComponent("Report Dashboard")
+                + "&name=" + encodeURIComponent(frm.doc.name)
+                + "&trigger_print=1"
+                + "&format=" + encodeURIComponent(print_format)
+                + "&no_letterhead=0"
+            ));
+        }
+    });
+}

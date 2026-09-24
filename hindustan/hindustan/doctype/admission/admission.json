@@ -306,6 +306,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "phone_number",
    "fieldtype": "Phone",
    "label": "Phone Number"
@@ -822,7 +823,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-17 10:44:03.343521",
+ "modified": "2026-07-04 12:48:41.452091",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "Admission",

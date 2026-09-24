@@ -70,6 +70,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "reciept_number",
    "fieldtype": "Data",
    "label": "Receipt Number",
@@ -220,7 +221,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-15 15:56:29.023911",
+ "modified": "2026-08-13 16:51:42.590048",
  "modified_by": "Administrator",
  "module": "Hindustan",
  "name": "General Receipt",

@@ -29,6 +29,8 @@ from frappe.utils import add_days, cint, cstr, flt, getdate, rounded, date_diff,
 import math
 class CustomSalarySlip(SalarySlip):
     def get_date_details(self):
+        super().get_date_details()
+
         # for i in self.earnings:
         #     if i.salary_component=='Basic':
         #         self.custom_earned_basic=i.amount
@@ -112,6 +114,7 @@ class CustomSalarySlip(SalarySlip):
                 self.gross_pay = math.floor(self.gross_pay)
 
     def validate(self):
+        super().validate()
         self.calculate_lop()
         
 class CustomFeeSchedule(FeeSchedule):

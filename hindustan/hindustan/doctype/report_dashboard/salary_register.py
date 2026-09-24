@@ -40,8 +40,10 @@ def make_xlsx_for_sr(sheet_name="SALARY REGISTER", wb=None):
 
     # Define column widths
     column_widths = {
-        'A': 20, 'B': 20, 'C': 20, 'D': 20, 'E': 20, 'F': 20,
-        'G': 20, 'H': 20, 'I': 20, 'J': 20, 'K': 25,'L':20,'M':20,'N':20,'O':20,'P':20,'Q':20,'R':20,'S':20
+        'A': 8, 'B': 25, 'C': 15, 'D': 15, 'E': 15, 'F': 15,
+        'G': 15, 'H': 15, 'I': 15, 'J': 18, 'K': 15, 'L': 15,
+        'M': 15, 'N': 15, 'O': 15, 'P': 15, 'Q': 15, 'R': 20,
+        'S': 18, 'T': 18
     }
     for col, width in column_widths.items():
         ws.column_dimensions[col].width = width
@@ -49,7 +51,7 @@ def make_xlsx_for_sr(sheet_name="SALARY REGISTER", wb=None):
     month_year = from_date.strftime('%B %Y')
     month_year=str(month_year).upper()
     ws.append([f"SALARY REGISTER FOR THE MONTH OF - {month_year}"])
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=19)
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=20)
     ws.cell(row=1, column=1).alignment = Alignment(horizontal='center', vertical='center')
     section_name = args.get("dept")
     if section_name:
@@ -57,17 +59,17 @@ def make_xlsx_for_sr(sheet_name="SALARY REGISTER", wb=None):
     else:
         section_display = "SECTION : ALL SECTIONS"
     ws.append([section_display])
-    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=19)
+    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=20)
     ws.cell(row=2, column=1).alignment = Alignment(horizontal='center', vertical='center')
     ws.cell(row=2, column=1).font = Font(bold=True)
 
     sub_header = [
-        "Name", "No:of Days", "Basic", "DA", "HRA", "Med",
+        "S.No", "Name", "No:of Days", "Basic", "DA", "HRA", "Med",
         "Conv", "Allow", "Gross Salary", "Pay Loss", "PF","P Tax","ESI","TDS","Loan","Adv","Other Deductions","Total Ded","Nett Sal"
     ]
     ws.append(sub_header)
     bold_font = Font(bold=True)
-    for cell in ws[3]:  # Header row is the second row
+    for cell in ws[3]:  # Header row is the third row
         cell.font = bold_font
     thin_border = Border(
         left=Side(style='thin'),
@@ -76,30 +78,29 @@ def make_xlsx_for_sr(sheet_name="SALARY REGISTER", wb=None):
         bottom=Side(style='thin')
     )
 
-    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=19):
+    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=20):
         for cell in row:
             cell.border = thin_border
             cell.alignment = Alignment(horizontal='center', vertical='center') 
 
     data=get_data_for_sr(args)
     totals = [0] * 17
-    net_pay_total = Decimal("0") 
+    net_pay_total = Decimal("0")
+    s_no = 0
     for employee_name, employee_data in data.items():
-        # lop=employee_data.get("gross_pay", "0")-employee_data.get("lop_amount", "0")
-        lop = employee_data.get("lop_amount", 0) or 0
+        s_no += 1
+        lop = float(employee_data.get("lop_amount", 0) or 0)
         tot_deductions=float(employee_data.get("total_deductions", 0) or 0)
         if lop<0:
             lop=0
         tot_deduction = tot_deductions + lop
         
         basic_amount = float(employee_data.get("basic_amount", 0) or 0)
-
-        # net_pay = Decimal(str(employee_data.get("net_pay", 0) or 0))
         net_pay = Decimal(str(employee_data.get("net_pay", 0) or 0))
-
         net_pay = net_pay.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
   
         row = [
+            s_no,
             employee_name,
             employee_data.get("no_of_days", "0"),
             basic_amount,
@@ -117,38 +118,30 @@ def make_xlsx_for_sr(sheet_name="SALARY REGISTER", wb=None):
             employee_data.get("loan_amount", "0"),
             employee_data.get("adv_amount", "0"),
             employee_data.get("other_deductions", "0"),
-            # employee_data.get("total_deductions", "0"),
             round(tot_deduction),
-            # employee_data.get("net_pay", "0")
             format(net_pay, '.2f')
         ]
         
         ws.append(row)
-    #     for i in range(1, 19):  
-    #         totals[i-1] += float(row[i]) if row[i] else 0
-    # totals_row = ["Total"] + [str(total) for total in totals]  
 
-
-        for i in range(1, 18): 
-            totals[i-1] += float(row[i]) if row[i] else 0
-        # net_pay_total += float(row[18]) if row[18] else 0
+        for i in range(2, 19): 
+            totals[i-2] += float(row[i]) if row[i] else 0
         net_pay_total += net_pay
-    # totals_row = ["Total"] + [str(total) for total in totals]  
-    # totals_row = ["Total"] + [str(int(total)) for total in totals] + [str(round(net_pay_total))]
+
     totals_row = (
-    ["Total"] +
-    [str(int(total)) for total in totals] +
-    [format(net_pay_total, '.2f')]
-)
+        ["Total", ""] +
+        [str(int(total)) for total in totals] +
+        [format(net_pay_total, '.2f')]
+    )
 
     ws.append(totals_row)
     ws.merge_cells(start_row=ws.max_row, start_column=1, end_row=ws.max_row, end_column=2)
-    total_cell = ws.cell(row=ws.max_row, column=1)  # This is the merged cell (SI NO)
+    total_cell = ws.cell(row=ws.max_row, column=1)  # This is the merged cell (Total)
     total_cell.alignment = Alignment(horizontal='center', vertical='center')
     for cell in ws[ws.max_row]:  # Total row
         cell.font = bold_font
         
-    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=19):
+    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=20):
         for cell in row:
             cell.border = thin_border
             cell.alignment = Alignment(horizontal='center', vertical='center')
@@ -165,27 +158,24 @@ def get_data_for_sr(args):
     from_date = args.get("from_date")
     to_date = args.get("to_date")
     institute = args.get("institute_name")
-    dept = args.get("dept")
+    dept = args.get("dept") or args.get("custom_section")
 
     if not from_date or not to_date:
         frappe.throw("Both 'from_date' and 'to_date' are required.")
 
     institute_condition = ""
-    if institute and not dept:
-        institute_condition = "AND e.custom_institute_name = %s"
-        params = (from_date, to_date, institute)
-    elif not institute and dept:
+    if dept:
         institute_condition = "AND e.custom_section = %s"
         params = (from_date, to_date, dept)
-    elif institute and dept:
-        institute_condition = "AND e.custom_institute_name = %s AND e.custom_section = %s"
-        params = (from_date, to_date, institute, dept)
+    elif institute:
+        institute_condition = "AND e.custom_institute_name = %s"
+        params = (from_date, to_date, institute)
     else:
         institute_condition = ""
         params = (from_date, to_date)
     queries = {
         "no_of_days": """
-            SELECT e.name AS employee_name, s.payment_days AS payment_days,e.employee_name as emp, s.custom_visiting_facility
+            SELECT e.name AS employee_name, s.payment_days AS payment_days,e.employee_name as emp, s.custom_visiting_facility, s.designation AS designation
             FROM `tabSalary Slip` s
             LEFT JOIN `tabEmployee` e ON s.employee = e.name
             LEFT JOIN `tabDesignation` d ON s.designation = d.name
@@ -196,7 +186,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -324,7 +314,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -359,7 +349,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -394,7 +384,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -429,7 +419,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -464,7 +454,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -569,7 +559,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -594,7 +584,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -619,7 +609,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -644,7 +634,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -669,7 +659,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -694,7 +684,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -719,7 +709,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -744,7 +734,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -768,7 +758,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -792,7 +782,7 @@ def get_data_for_sr(args):
             {institute_condition}
             ORDER BY
         CASE 
-            WHEN e.custom_section = 'OFFICE' THEN 
+            WHEN e.custom_section = 'OFFICE' OR e.custom_section = 'Office' THEN 
                 CASE WHEN IFNULL(d.custom_office_order_no, 0) = 0 THEN 9999 ELSE d.custom_office_order_no END
             WHEN e.custom_section = 'HEA' THEN 
                 CASE WHEN IFNULL(d.custom_hea_order_no, 0) = 0 THEN 9999 ELSE d.custom_hea_order_no END
@@ -816,6 +806,9 @@ def get_data_for_sr(args):
             if employee_name not in data:
                 data[employee_name] = {}
 
+            if "designation" in row and row.get("designation"):
+                data[employee_name]["designation"] = row["designation"]
+
             if key == "no_of_days" and row.get("payment_days"):
                 data[employee_name][key] = int(row["payment_days"])  
             else:
@@ -836,11 +829,20 @@ def get_salary_register_data(from_date, to_date, institute=None, dept=None):
     return get_data_for_sr(args)
 
 
-def get_salary_register_data_for_jinja(doc):
-    from_date = getattr(doc, "from_date", None)
-    to_date = getattr(doc, "to_date", None)
-    institute = getattr(doc, "institute_name", None)
-    dept = getattr(doc, "custom_section", None)
+def get_salary_register_data_for_jinja(doc=None):
+    if doc is None:
+        doc = frappe.local.form_dict
+    
+    if isinstance(doc, dict):
+        from_date = doc.get("from_date")
+        to_date = doc.get("to_date")
+        institute = doc.get("institute_name")
+        dept = doc.get("custom_section") or doc.get("dept")
+    else:
+        from_date = getattr(doc, "from_date", None) or frappe.local.form_dict.get("from_date")
+        to_date = getattr(doc, "to_date", None) or frappe.local.form_dict.get("to_date")
+        institute = getattr(doc, "institute_name", None) or frappe.local.form_dict.get("institute_name")
+        dept = getattr(doc, "custom_section", None) or getattr(doc, "dept", None) or frappe.local.form_dict.get("custom_section") or frappe.local.form_dict.get("dept")
 
     if not from_date or not to_date:
         return {} 

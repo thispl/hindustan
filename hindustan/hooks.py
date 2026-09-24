@@ -193,7 +193,7 @@ doc_events = {
         "after_insert": "hindustan.salary_slip_custom.update_earned_basic"
     },
     "Student":{
-        "validate":["hindustan.stud_custom.student_doc_validation_method","hindustan.stud_custom.validate_mail",
+        "validate":["hindustan.stud_custom.student_doc_validation_method","hindustan.stud_custom.validate_mail",'hindustan.stud_custom.update_receiving_person'
                     # "hindustan.custom.create_enrollment_test"
                     ],
         'after_insert':["hindustan.stud_custom.create_enrollment","hindustan.stud_custom.update_student_number",'hindustan.stud_custom.update_receiving_person']

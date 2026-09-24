@@ -162,10 +162,26 @@ def update_student_number(doc,method):
 
 
 
+# @frappe.whitelist()
+# def update_receiving_person(doc,method):
+#     instructor_doc = frappe.new_doc("Receiving Person")
+#     instructor_doc.is_student = 1
+#     instructor_doc.student = doc.name
+#     instructor_doc.person_name = doc.student_name
+#     instructor_doc.insert(ignore_permissions=True)
+
+
+
 @frappe.whitelist()
-def update_receiving_person(doc,method):
-    instructor_doc = frappe.new_doc("Receiving Person")
-    instructor_doc.is_student = 1
-    instructor_doc.student = doc.name
-    instructor_doc.person_name = doc.student_name
-    instructor_doc.insert(ignore_permissions=True)
+def update_receiving_person(doc, method):
+    existing_person = frappe.db.exists("Receiving Person", {
+        "student": doc.name,
+        "is_student": 1
+    })
+
+    if not existing_person:
+        receiving_person = frappe.new_doc("Receiving Person")
+        receiving_person.is_student = 1
+        receiving_person.student = doc.name
+        receiving_person.person_name = doc.student_name
+        receiving_person.insert(ignore_permissions=True)

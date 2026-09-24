@@ -59,7 +59,7 @@ def validate_advance_payments(doc, methods):
                             row.custom_amount_paid = registration.amount_paid                                                                                
 
 
-# To get the total outstanding and total grand total
+# # To get the total outstanding and total grand total
 @frappe.whitelist()
 def validate_outstanding_amount(doc, method):
     grand_total = 0
@@ -108,7 +108,6 @@ def program_change_check(doc, method):
             # row.custom_outstanding_amount = 0
 
         doc.custom_remarks = "Program Changed"
-
 
 
 

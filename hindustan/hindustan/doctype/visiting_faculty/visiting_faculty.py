@@ -12,7 +12,8 @@ class VisitingFaculty(Document):
                 {
                     "employee": self.employee,
                     "from_date": self.from_date,
-                    "name": ["!=", self.name]    
+                    "name": ["!=", self.name],
+                    "docstatus": ["!=", 2],
                 }
             )
 

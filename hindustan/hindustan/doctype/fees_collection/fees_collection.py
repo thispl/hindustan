@@ -121,8 +121,10 @@ class FeesCollection(AccountsController):
 		out=0
 		for i in fees.components:
 			out+=i.custom_outstanding_amount
+		
 		fees.custom_outstanding_amount=out
-		fees.save(ignore_permissions=True)
+		# fees.save(ignore_permissions=True)
+		frappe.db.set_value("Fees", fees.name, "outstanding_amount", out, update_modified=True)
 		
 		# self.make_gl_entries()
    
@@ -605,20 +607,53 @@ def validate_amount_paid(self):
 			frappe.throw("Could not save document with <b>zero payment</b>")
 	
 # to update outstanding_amount in fee master
+# @frappe.whitelist()
+# def update_outstanding_amount(fee_name):
+# 	fees = frappe.get_doc("Fees", fee_name)
+# 	tot_out = 0
+# 	tot_amt = 0
+# 	for row in fees.components:
+# 		frappe.errprint("INSIDE")
+# 		tot_out += row.custom_outstanding_amount
+# 		tot_amt += row.amount
+# 		frappe.errprint(f"{row.fees_category} -> outstanding: {row.custom_outstanding_amount}")
+# 	meta = frappe.get_meta("Fees")
+# 	field = meta.get_field("outstanding_amount")
+# 	frappe.errprint(field.allow_on_submit)
+# 	frappe.errprint("tot_out")
+# 	frappe.errprint(tot_out)
+# 	frappe.errprint("tot_amt")
+# 	frappe.errprint(tot_amt)
+# 	fees.outstanding_amount = tot_out
+# 	fees.grand_total = tot_amt
+# 	frappe.errprint(fees.outstanding_amount)
+# 	frappe.errprint(fees.grand_total)
+# 	frappe.errprint(fees.grand_total)
+# 	fees.grand_total_in_words = money_in_words(fees.grand_total)
+# 	fees.save(ignore_permissions=True)
+# 	frappe.db.commit()
+ 
+
+
 @frappe.whitelist()
 def update_outstanding_amount(fee_name):
-	fees = frappe.get_doc("Fees", fee_name)
-	tot_out = 0
-	tot_amt = 0
-	for row in fees.components:
-		tot_out += row.custom_outstanding_amount
-		tot_amt += row.amount
-	fees.outstanding_amount = tot_out
-	fees.grand_total = tot_amt
-	fees.grand_total_in_words = money_in_words(fees.grand_total)
-	fees.save(ignore_permissions=True)
-	frappe.db.commit()
- 
+    fees = frappe.get_doc("Fees", fee_name)
+    tot_out = 0
+    tot_amt = 0
+    for row in fees.components:
+        tot_out += row.custom_outstanding_amount or 0
+        tot_amt += row.amount or 0
+
+    grand_total_words = money_in_words(tot_amt)
+
+    frappe.db.set_value("Fees", fee_name, {
+        "outstanding_amount": tot_out,
+        "grand_total": tot_amt,
+        "grand_total_in_words": grand_total_words,
+    }, update_modified=True)
+
+    frappe.db.commit()
+
 @frappe.whitelist()
 def cancel_fees_collection(self):
 	if frappe.db.exists("Payment Entry", {"custom_reference_docname": self.name, "docstatus": 1}):
